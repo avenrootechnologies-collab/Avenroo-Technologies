@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1128" height="191" viewBox="0 0 1128 191" role="img" aria-label="Avenroo Technologies LinkedIn banner">
+  <rect width="1128" height="191" fill="#F7FBFF"/>
+  <path d="M48 0L90 191M168 0L210 191M288 0L330 191M408 0L450 191M528 0L570 191" stroke="#E8F2FF"/>
+  <circle cx="1018" cy="82" r="190" fill="#E8F2FF"/>
+  <circle cx="1044" cy="78" r="108" fill="#FDEAEA"/>
+  <rect x="48" y="35" width="130" height="120" rx="22" fill="#FFFFFF" stroke="#D7E8FF" stroke-width="2"/>
+  <rect x="75" y="59" width="78" height="78" rx="16" fill="#FFFFFF" stroke="#D7E8FF" stroke-width="2"/>
+  <text x="91" y="130" fill="#0B5FFF" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="800">A</text>
+  <rect x="125" y="70" width="16" height="6" rx="3" fill="#E53935"/>
+  <circle cx="134" cy="115" r="4" fill="#E53935"/>
+  <text x="218" y="84" fill="#102033" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">Avenroo Technologies</text>
+  <text x="220" y="113" fill="#5B6B7C" font-family="Segoe UI, Arial, sans-serif" font-size="17">Premium SaaS, Software Development &amp; IT Consulting</text>
+  <text x="220" y="145" fill="#0B5FFF" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">Build. Scale. Transform.</text>
+  <path d="M842 54H1020M904 79H1068M842 104H990" stroke-linecap="round" fill="none"/>
+  <path d="M842 54H1020" stroke="#0B5FFF" stroke-width="3"/>
+  <path d="M904 79H1068" stroke="#E53935" stroke-width="3"/>
+  <path d="M842 104H990" stroke="#9CC7FF" stroke-width="2"/>
+  <circle cx="842" cy="54" r="5" fill="#0B5FFF"/>
+  <circle cx="1020" cy="54" r="5" fill="#0B5FFF"/>
+  <circle cx="904" cy="79" r="5" fill="#E53935"/>
+  <circle cx="1068" cy="79" r="5" fill="#E53935"/>
+  <circle cx="990" cy="104" r="5" fill="#9CC7FF"/>
+</svg>

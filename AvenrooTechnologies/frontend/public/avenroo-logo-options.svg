@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" fill="none">
+  <rect width="1600" height="1000" fill="#F3F7F6"/>
+  <text x="96" y="92" fill="#102726" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="4">AVENROO TECHNOLOGIES</text>
+  <text x="96" y="145" fill="#627471" font-family="Arial, sans-serif" font-size="16" letter-spacing="1">LOGO DIRECTIONS · 01—04</text>
+
+  <rect x="72" y="190" width="704" height="340" rx="28" fill="#FFFFFF"/>
+  <rect x="824" y="190" width="704" height="340" rx="28" fill="#FFFFFF"/>
+  <rect x="72" y="570" width="704" height="340" rx="28" fill="#FFFFFF"/>
+  <rect x="824" y="570" width="704" height="340" rx="28" fill="#FFFFFF"/>
+
+  <!-- 01: geometric A with forward signal -->
+  <rect x="124" y="292" width="132" height="132" rx="38" fill="#102D2B"/>
+  <path d="M150 390 181 324h18l31 66h-24l-5-12h-23l-5 12h-23Zm37-30h8l-4-11-4 11Z" fill="#F4FFFC"/>
+  <path d="m211 333 17-18 14 14-17 17-14-13Z" fill="#39D2BA"/>
+  <text x="286" y="357" fill="#102D2B" font-family="Arial, sans-serif" font-size="46" font-weight="700" letter-spacing="-2">Avenroo</text>
+  <text x="289" y="392" fill="#168F81" font-family="Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="6">TECHNOLOGIES</text>
+  <text x="124" y="474" fill="#71817E" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2">01  ·  SIGNAL A</text>
+
+  <!-- 02: AV monogram -->
+  <rect x="876" y="292" width="132" height="132" rx="38" fill="#E8F4F1"/>
+  <path d="m900 386 27-58h17l27 58h-21l-5-12h-21l-5 12h-19Z" fill="#123A36"/>
+  <path d="m935 358 19-30 22 58h-20l-21-28Z" fill="#20B69F"/>
+  <text x="1038" y="357" fill="#102D2B" font-family="Arial, sans-serif" font-size="46" font-weight="700" letter-spacing="-2">Avenroo</text>
+  <text x="1041" y="392" fill="#168F81" font-family="Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="6">TECHNOLOGIES</text>
+  <text x="876" y="474" fill="#71817E" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2">02  ·  AV MONOGRAM</text>
+
+  <!-- 03: editorial wordmark -->
+  <path d="M139 698h77" stroke="#2BBDA6" stroke-width="5" stroke-linecap="round"/>
+  <text x="124" y="767" fill="#102D2B" font-family="Georgia, serif" font-size="64" font-weight="700" letter-spacing="-3">Avenroo</text>
+  <text x="130" y="804" fill="#526B66" font-family="Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="8">TECHNOLOGIES</text>
+  <text x="124" y="854" fill="#71817E" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2">03  ·  EDITORIAL WORDMARK</text>
+
+  <!-- 04: connected systems -->
+  <circle cx="936" cy="749" r="56" fill="#102D2B"/>
+  <path d="M916 773v-25l20-29 20 29v25M916 748h40" stroke="#F4FFFC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="916" cy="748" r="7" fill="#42D7BE"/>
+  <circle cx="936" cy="719" r="7" fill="#42D7BE"/>
+  <circle cx="956" cy="748" r="7" fill="#42D7BE"/>
+  <text x="1020" y="747" fill="#102D2B" font-family="Arial, sans-serif" font-size="46" font-weight="700" letter-spacing="-2">Avenroo</text>
+  <text x="1023" y="782" fill="#168F81" font-family="Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="6">TECHNOLOGIES</text>
+  <text x="876" y="854" fill="#71817E" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2">04  ·  CONNECTED SYSTEMS</text>
+</svg>
