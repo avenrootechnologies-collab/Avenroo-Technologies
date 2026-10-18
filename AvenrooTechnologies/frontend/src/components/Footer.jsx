@@ -4,6 +4,7 @@ import {
   BriefcaseBusiness,
   Camera,
   Layers3,
+  MapPin,
   Mail,
   MessageCircle,
   PhoneCall,
@@ -20,6 +21,10 @@ const whatsappMessage =
   "Hi Avenroo Technologies, I want to discuss a website, app, automation, or security project.";
 const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "shaurixinfotechsolution@gmail.com";
 const contactPhone = import.meta.env.VITE_CONTACT_PHONE || "";
+const linkedinUrl =
+  import.meta.env.VITE_LINKEDIN_URL || "https://www.linkedin.com/company/avenroo-technologies/";
+const instagramUrl =
+  import.meta.env.VITE_INSTAGRAM_URL || "https://www.instagram.com/avenrootechnologies?obrf=cmR6bzR4eGJxZzFr";
 
 const buildWhatsAppHref = () => {
   const encodedMessage = encodeURIComponent(whatsappMessage);
@@ -68,12 +73,12 @@ const directLinks = [
 const socialLinks = [
   {
     label: "LinkedIn",
-    href: import.meta.env.VITE_LINKEDIN_URL || "",
+    href: linkedinUrl,
     icon: BriefcaseBusiness,
   },
   {
     label: "Instagram",
-    href: import.meta.env.VITE_INSTAGRAM_URL || "",
+    href: instagramUrl,
     icon: Camera,
   },
   {
@@ -160,6 +165,11 @@ export default function Footer() {
               })}
             </div>
 
+            <address className="mt-5 flex items-center gap-2 text-sm text-white/72 not-italic">
+              <MapPin size={16} className="shrink-0 text-mint-400" aria-hidden="true" />
+              Gurugram, Haryana
+            </address>
+
             <div className="mt-6">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/48">
                 Social
@@ -208,3 +218,4 @@ export default function Footer() {
     </footer>
   );
 }
+
