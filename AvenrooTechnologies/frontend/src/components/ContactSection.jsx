@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import API from "../api/axios";
 
-const defaultContactEmail = "shaurixinfotechsolution@gmail.com";
+const defaultContactEmail = "avenrootechnologies@gmail.com";
 const defaultWhatsAppMessage =
   "Hi Avenroo Technologies, I want to discuss a project.";
 
@@ -444,3 +444,4 @@ export default function ContactSection() {
     </section>
   );
 }
+
