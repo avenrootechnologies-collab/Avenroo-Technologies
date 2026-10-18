@@ -20,7 +20,7 @@ const whatsappMessage =
   import.meta.env.VITE_WHATSAPP_MESSAGE ||
   "Hi Avenroo Technologies, I want to discuss a website, app, automation, or security project.";
 const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "shaurixinfotechsolution@gmail.com";
-const contactPhone = import.meta.env.VITE_CONTACT_PHONE || "";
+const contactPhone = import.meta.env.VITE_CONTACT_PHONE || "+91 98390 79570";
 const linkedinUrl =
   import.meta.env.VITE_LINKEDIN_URL || "https://www.linkedin.com/company/avenroo-technologies/";
 const instagramUrl =
@@ -64,7 +64,9 @@ const directLinks = [
     icon: Mail,
   },
   {
-    label: "Call",
+    label: "Phone",
+    display: contactPhone,
+    ariaLabel: `Call ${contactPhone}`,
     href: buildPhoneHref(),
     icon: PhoneCall,
   },
@@ -153,13 +155,13 @@ export default function Footer() {
                   <a
                     key={link.label}
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target={link.href.startsWith("https://") ? "_blank" : undefined}
+                    rel={link.href.startsWith("https://") ? "noopener noreferrer" : undefined}
                     className="brand-button inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
-                    aria-label={`Open ${link.label}`}
+                    aria-label={link.ariaLabel || `Open ${link.label}`}
                   >
                     <Icon size={15} />
-                    {link.label}
+                    {link.display || link.label}
                   </a>
                 );
               })}
