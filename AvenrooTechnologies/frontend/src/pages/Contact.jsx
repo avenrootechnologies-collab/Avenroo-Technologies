@@ -9,7 +9,7 @@ import { editorialPhotos } from "../content/visuals";
 import EditorialPhotoCard from "../components/EditorialPhotoCard";
 import PosterCard from "../components/PosterCard";
 
-const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "shaurixinfotechsolution@gmail.com";
+const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "avenrootechnologies@gmail.com";
 
 export default function ContactPage() {
   return (
@@ -103,3 +103,4 @@ export default function ContactPage() {
     </div>
   );
 }
+
