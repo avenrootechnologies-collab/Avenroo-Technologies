@@ -19,7 +19,7 @@ const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || "";
 const whatsappMessage =
   import.meta.env.VITE_WHATSAPP_MESSAGE ||
   "Hi Avenroo Technologies, I want to discuss a website, app, automation, or security project.";
-const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "shaurixinfotechsolution@gmail.com";
+const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "avenrootechnologies@gmail.com";
 const contactPhone = import.meta.env.VITE_CONTACT_PHONE || "+91 98390 79570";
 const linkedinUrl =
   import.meta.env.VITE_LINKEDIN_URL || "https://www.linkedin.com/company/avenroo-technologies/";
