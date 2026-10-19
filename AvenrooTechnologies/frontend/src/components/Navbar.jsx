@@ -38,7 +38,7 @@ function getNavItems(pathname) {
       { label: "Selected work", type: "anchor", href: "#work" },
       { label: "Approach", type: "anchor", href: "#approach" },
       { label: "Testimonials", type: "anchor", href: "#testimonials" },
-      { label: "Contact", type: "route", to: "/contact" },
+      { label: "Enquire / Apply", type: "route", to: "/#student-connect" },
     ];
   }
 
@@ -55,6 +55,7 @@ function getNavItems(pathname) {
       { label: "Programs", type: "anchor", href: "#student-programs" },
       { label: "Courses", type: "anchor", href: "#student-courses" },
       { label: "Projects", type: "anchor", href: "#student-projects" },
+      { label: "Portfolio", type: "route", to: "/portfolio" },
       { label: "Learning path", type: "anchor", href: "#learning-path" },
       { label: "Reviews", type: "anchor", href: "#reviews" },
       { label: "Enquire / Apply", type: "student-form" },
