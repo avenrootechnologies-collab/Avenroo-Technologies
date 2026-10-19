@@ -15,6 +15,7 @@ const Home = lazy(() => import("./components/Home"));
 const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const ContactPage = lazy(() => import("./pages/Contact"));
 const StudentsPage = lazy(() => import("./pages/StudentsPage"));
+const PortfolioPage = lazy(() => import("./pages/PortfolioPage"));
 
 function StudentRoute() {
   const [isReady, setIsReady] = useState(false);
@@ -81,6 +82,7 @@ function App() {
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/students" element={<Navigate to="/" replace />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/portfolio" element={<PortfolioPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

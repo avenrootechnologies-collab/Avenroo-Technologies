@@ -7,6 +7,7 @@ import BrandLogo from "./BrandLogo";
 const pageNavigation = {
   home: [
     { label: "Students", type: "route", to: "/" },
+    { label: "Portfolio", type: "route", to: "/portfolio" },
     { label: "Services", type: "anchor", href: "#services" },
     { label: "Process", type: "anchor", href: "#process" },
     { label: "Results", type: "anchor", href: "#results" },
@@ -15,6 +16,7 @@ const pageNavigation = {
   ],
   services: [
     { label: "Students", type: "route", to: "/" },
+    { label: "Portfolio", type: "route", to: "/portfolio" },
     { label: "Deliverables", type: "anchor", href: "#deliverables" },
     { label: "Workflow", type: "anchor", href: "#workflow" },
     { label: "Engagement", type: "anchor", href: "#engagement" },
@@ -22,6 +24,7 @@ const pageNavigation = {
   ],
   contact: [
     { label: "Students", type: "route", to: "/" },
+    { label: "Portfolio", type: "route", to: "/portfolio" },
     { label: "Brief", type: "anchor", href: "#project-brief" },
     { label: "Process", type: "anchor", href: "#contact-process" },
     { label: "Services", type: "route", to: "/services" },
@@ -30,6 +33,15 @@ const pageNavigation = {
 };
 
 function getNavItems(pathname) {
+  if (pathname === "/portfolio") {
+    return [
+      { label: "Selected work", type: "anchor", href: "#work" },
+      { label: "Approach", type: "anchor", href: "#approach" },
+      { label: "Testimonials", type: "anchor", href: "#testimonials" },
+      { label: "Contact", type: "route", to: "/contact" },
+    ];
+  }
+
   if (pathname === "/services") {
     return pageNavigation.services;
   }

@@ -41,6 +41,7 @@ const buildPhoneHref = () => {
 
 const footerLinks = [
   { label: "Home", to: "/clients" },
+  { label: "Portfolio", to: "/portfolio" },
   { label: "Services", to: "/services" },
   { label: "Contact", to: "/contact" },
 ];
