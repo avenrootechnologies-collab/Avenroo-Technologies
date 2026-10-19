@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Clock3, Menu, MoonStar, Sparkles, SunMedium, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import useTheme from "./useTheme";
@@ -55,9 +55,9 @@ function getNavItems(pathname) {
 const clientLanes = ["Websites", "Apps", "Automation", "Security"];
 const studentLanes = ["Courses", "Internships", "Projects", "Industry sessions"];
 
-export default function Navbar({ onStudentEnquiry }) {
+function NavbarContent({ onStudentEnquiry, pathname }) {
   const [open, setOpen] = useState(false);
-  const { pathname } = useLocation();
+  const mobileMenuButtonRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const navItems = getNavItems(pathname);
   const isStudentView = pathname === "/" || pathname === "/students";
@@ -82,6 +82,34 @@ export default function Navbar({ onStudentEnquiry }) {
 
   const themeLabel = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
   const ThemeIcon = theme === "dark" ? SunMedium : MoonStar;
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        mobileMenuButtonRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [open]);
+
+  useEffect(() => {
+    const desktopViewport = window.matchMedia("(min-width: 1280px)");
+    const closeMobileMenu = (event) => {
+      if (event.matches) {
+        setOpen(false);
+      }
+    };
+
+    desktopViewport.addEventListener("change", closeMobileMenu);
+    return () => desktopViewport.removeEventListener("change", closeMobileMenu);
+  }, []);
 
   const renderItem = (item) => {
     if (item.type === "route") {
@@ -128,14 +156,14 @@ export default function Navbar({ onStudentEnquiry }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 px-4 pt-4 sm:px-6">
+    <header className="site-header sticky top-0 z-40">
       <div className="nav-shell mx-auto max-w-7xl rounded-[26px] px-4 py-3 sm:px-5">
         <div className="flex items-center gap-3">
           <Link to="/" className="nav-brand shrink-0" aria-label="Avenroo Technologies student home">
             <BrandLogo />
           </Link>
 
-          <nav className="nav-links-wrap hidden min-w-0 flex-1 items-center justify-center gap-1 text-sm xl:flex">
+          <nav aria-label="Primary navigation" className="nav-links-wrap hidden min-w-0 flex-1 items-center justify-center gap-1 text-sm xl:flex">
             {navItems.map(renderItem)}
           </nav>
 
@@ -188,22 +216,31 @@ export default function Navbar({ onStudentEnquiry }) {
               to={switchPath}
               className="view-switch view-switch--compact"
               aria-label={`Switch to ${switchLabel.toLowerCase()} website`}
+              onClick={() => setOpen(false)}
             >
               {isStudentView ? "Clients" : "Students"}
             </Link>
             <button
+              ref={mobileMenuButtonRef}
+              type="button"
               className="theme-button"
-              onClick={() => setOpen(!open)}
+              onClick={() => setOpen((current) => !current)}
+              aria-expanded={open}
+              aria-controls="mobile-site-navigation"
               aria-label={open ? "Close navigation" : "Open navigation"}
+              title={open ? "Close navigation" : "Open navigation"}
             >
-              {open ? <X /> : <Menu />}
+              {open ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
-        {open && (
-          <div className="surface-panel-solid mt-4 rounded-[24px] p-6 xl:hidden">
-            <nav className="flex flex-col gap-4 text-base text-[var(--text-strong)]">
+        <div
+          id="mobile-site-navigation"
+          hidden={!open}
+          className="mobile-navigation surface-panel-solid mt-3 rounded-[20px] p-4 sm:mt-4 sm:rounded-[24px] sm:p-6 xl:hidden"
+        >
+            <nav aria-label="Mobile navigation" className="flex flex-col gap-3 text-base text-[var(--text-strong)] sm:gap-4">
               <div className="rounded-[22px] border border-[var(--chip-border)] bg-[var(--chip-bg)] p-4">
                 <div className="flex items-start gap-3">
                   <div className="rounded-2xl bg-mint-500/12 p-3 text-mint-500">
@@ -267,9 +304,21 @@ export default function Navbar({ onStudentEnquiry }) {
                 )}
               </div>
             </nav>
-          </div>
-        )}
+        </div>
       </div>
     </header>
   );
 }
+
+export default function Navbar({ onStudentEnquiry }) {
+  const { pathname } = useLocation();
+
+  return (
+    <NavbarContent
+      key={pathname}
+      pathname={pathname}
+      onStudentEnquiry={onStudentEnquiry}
+    />
+  );
+}
+

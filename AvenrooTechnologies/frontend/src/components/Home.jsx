@@ -16,7 +16,7 @@ import WhyUsSection from "./WhyUsSection";
 
 export default function Home() {
   return (
-    <div className="page-shell relative overflow-hidden">
+    <div className="page-shell relative overflow-x-clip">
       <Spotlight />
       <Navbar />
 
@@ -48,3 +48,4 @@ export default function Home() {
     </div>
   );
 }
+

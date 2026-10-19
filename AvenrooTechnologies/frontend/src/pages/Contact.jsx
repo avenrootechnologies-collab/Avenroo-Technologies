@@ -13,7 +13,7 @@ const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "avenrootechnologies@
 
 export default function ContactPage() {
   return (
-    <div className="page-shell relative overflow-hidden">
+    <div className="page-shell relative overflow-x-clip">
       <Spotlight />
       <Navbar />
 

@@ -97,10 +97,10 @@ export default function Footer() {
   const links = footerLinks.map((link) => link.label === "Home" ? { ...link, to: isStudentView ? "/" : "/clients" } : link);
 
   return (
-    <footer className="px-4 pb-8 pt-4 sm:px-6">
-      <div className="surface-panel-inverse mx-auto max-w-7xl rounded-[28px] p-6 text-white sm:p-8">
-        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr_0.85fr]">
-          <div>
+    <footer className="site-footer">
+      <div className="surface-panel-inverse footer-panel mx-auto max-w-7xl rounded-[24px] p-5 text-white sm:rounded-[32px] sm:p-7 lg:p-8">
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.15fr_0.85fr_0.85fr] xl:gap-10">
+          <div className="min-w-0 md:col-span-2 xl:col-span-1">
             <BrandLogo />
             <h2 className="display-font mt-4 max-w-2xl text-2xl leading-tight sm:text-3xl">
               Digital delivery that looks credible, works cleanly, and stays easier to maintain.
@@ -115,7 +115,7 @@ export default function Footer() {
                 <Link
                   key={link.label}
                   to={link.to}
-                  className="inline-flex items-center rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
                 >
                   {link.label}
                 </Link>
@@ -123,7 +123,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-white/48">
               Service lanes
             </h3>
@@ -143,7 +143,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-white/48">
               Contact
             </h3>
@@ -157,7 +157,7 @@ export default function Footer() {
                     href={link.href}
                     target={link.href.startsWith("https://") ? "_blank" : undefined}
                     rel={link.href.startsWith("https://") ? "noopener noreferrer" : undefined}
-                    className="brand-button inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+                    className="brand-button inline-flex min-h-11 max-w-full items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
                     aria-label={link.ariaLabel || `Open ${link.label}`}
                   >
                     <Icon size={15} />
@@ -187,7 +187,7 @@ export default function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
                         aria-label={`Open ${link.label}`}
                       >
                         <Icon size={15} />
@@ -198,7 +198,7 @@ export default function Footer() {
                 ) : (
                   <Link
                     to="/contact"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
                   >
                     Contact us
                     <ArrowUpRight size={15} />
@@ -209,12 +209,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/52 sm:flex-row sm:items-center sm:justify-between">
-          <p className="break-words">
+        <div className="mt-7 grid min-w-0 gap-3 border-t border-white/10 pt-5 text-sm text-white/60 sm:mt-8 sm:pt-6 md:grid-cols-2 md:items-center">
+          <p className="min-w-0 break-words">
             {currentYear} Avenroo Technologies. Websites, applications, automation, security,
             and support.
           </p>
-          <p>Response target within 1 business day for qualified briefs.</p>
+          <p className="min-w-0 break-words md:text-right">Response target within 1 business day for qualified briefs.</p>
         </div>
       </div>
     </footer>

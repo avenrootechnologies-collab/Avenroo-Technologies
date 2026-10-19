@@ -121,7 +121,7 @@ export default function StudentsPage() {
   }, [location.hash, location.pathname, location.search, navigate]);
 
   return (
-    <div className="page-shell relative overflow-hidden">
+    <div className="page-shell relative overflow-x-clip">
       <Spotlight />
       <Navbar onStudentEnquiry={() => openStudentForm("enquiry")} />
       <main className="relative z-10">
@@ -304,3 +304,4 @@ export default function StudentsPage() {
     </div>
   );
 }
+

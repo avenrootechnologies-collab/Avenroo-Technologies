@@ -82,7 +82,8 @@ html[data-theme="dark"] {
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 7rem;
+  scroll-padding-top: 7.5rem;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -143,12 +144,50 @@ select {
 
 .page-shell {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .display-font {
   font-family: "Space Grotesk", "Manrope", sans-serif;
   font-weight: 700;
   letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.site-header {
+  padding: max(0.75rem, env(safe-area-inset-top, 0px))
+    max(0.75rem, env(safe-area-inset-right, 0px)) 0
+    max(0.75rem, env(safe-area-inset-left, 0px));
+}
+
+.mobile-navigation {
+  max-height: calc(100vh - 6.25rem);
+  max-height: calc(100dvh - 6.25rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-navigation .nav-link {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.site-footer {
+  padding: 1rem max(1rem, env(safe-area-inset-right, 0px))
+    calc(2rem + env(safe-area-inset-bottom, 0px))
+    max(1rem, env(safe-area-inset-left, 0px));
+}
+
+.footer-panel,
+.footer-panel > * {
+  min-width: 0;
+}
+
+.footer-panel .brand-button {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .eyebrow {
@@ -543,6 +582,10 @@ html[data-theme="dark"] .student-form-feedback--error {
 }
 
 .nav-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
   color: var(--text-body);
   border-radius: 999px;
   padding: 0.7rem 1rem;
@@ -928,6 +971,11 @@ html[data-theme="dark"] .student-form-feedback--error {
 }
 
 @media (min-width: 640px) {
+  .site-header {
+    padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
+    padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+  }
+
   .scroll-top-button {
     right: 1.5rem;
     bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
@@ -941,3 +989,39 @@ html[data-theme="dark"] .student-form-feedback--error {
     font-size: 1.85rem;
   }
 }
+
+@media (max-width: 479px) {
+  .nav-shell {
+    border-radius: 1.25rem;
+    padding-inline: 0.75rem;
+  }
+
+  .footer-panel {
+    padding: 1.1rem;
+  }
+
+  .editorial-photo {
+    min-height: 16rem;
+    border-radius: 1.5rem;
+  }
+
+  .editorial-photo__content {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

@@ -20,7 +20,7 @@ const serviceHighlights = [
 
 export default function ServicesPage() {
   return (
-    <div className="page-shell relative overflow-hidden">
+    <div className="page-shell relative overflow-x-clip">
       <Spotlight />
       <Navbar />
 
@@ -96,3 +96,4 @@ export default function ServicesPage() {
     </div>
   );
 }
+
