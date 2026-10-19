@@ -43,7 +43,7 @@ const footerLinks = [
   { label: "Home", to: "/clients" },
   { label: "Portfolio", to: "/portfolio" },
   { label: "Services", to: "/services" },
-  { label: "Contact", to: "/contact" },
+  { label: "Contact", to: "/#student-connect" },
 ];
 
 const footerServices = [
@@ -198,7 +198,7 @@ export default function Footer() {
                   })
                 ) : (
                   <Link
-                    to="/contact"
+                    to="/#student-connect"
                     className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
                   >
                     Contact us

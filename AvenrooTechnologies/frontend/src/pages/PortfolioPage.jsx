@@ -205,7 +205,7 @@ function ProjectCard({ project, index }) {
             {project.linkLabel}<ArrowUpRight size={16} />
           </a>
         ) : (
-          <Link className="portfolio-project-link" to="/contact">
+          <Link className="portfolio-project-link" to="/#student-connect">
             {project.linkLabel}<ArrowUpRight size={16} />
           </Link>
         )}
@@ -267,7 +267,7 @@ export default function PortfolioPage() {
                 <a className="brand-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold" href="#work">
                   Explore selected work <ArrowDown size={16} />
                 </a>
-                <Link className="portfolio-text-link" to="/contact">Have a project in mind? <ArrowUpRight size={15} /></Link>
+                <Link className="portfolio-text-link" to="/#student-connect">Have a project in mind? <ArrowUpRight size={15} /></Link>
               </div>
               <div className="portfolio-hero-proof">
                 <span><b>03</b> selected builds</span><i />
@@ -372,7 +372,7 @@ export default function PortfolioPage() {
               <p className="eyebrow">Your next build starts here</p>
               <h2 className="display-font">Bring us the idea.<br /><em>We’ll help make it real.</em></h2>
               <p>Tell us what you’re trying to improve, launch, or make simpler. We’ll help shape a useful next step.</p>
-              <Link className="brand-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold" to="/contact">
+              <Link className="brand-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold" to="/#student-connect">
                 Start a conversation <ArrowUpRight size={16} />
               </Link>
             </div>

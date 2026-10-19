@@ -166,7 +166,7 @@ export default function PricingSection({ sectionId = "engagement" }) {
               </div>
 
               <Link
-                to="/contact"
+                to="/#student-connect"
                 className="brand-button mt-6 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
               >
                 Discuss this scope

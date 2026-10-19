@@ -12,7 +12,7 @@ const pageNavigation = {
     { label: "Process", type: "anchor", href: "#process" },
     { label: "Results", type: "anchor", href: "#results" },
     { label: "Reviews", type: "anchor", href: "#reviews" },
-    { label: "Contact", type: "route", to: "/contact" },
+    { label: "Contact", type: "route", to: "/#student-connect" },
   ],
   services: [
     { label: "Students", type: "route", to: "/" },
@@ -20,7 +20,7 @@ const pageNavigation = {
     { label: "Deliverables", type: "anchor", href: "#deliverables" },
     { label: "Workflow", type: "anchor", href: "#workflow" },
     { label: "Engagement", type: "anchor", href: "#engagement" },
-    { label: "Contact", type: "route", to: "/contact" },
+    { label: "Contact", type: "route", to: "/#student-connect" },
   ],
   contact: [
     { label: "Students", type: "route", to: "/" },
@@ -91,7 +91,7 @@ function NavbarContent({ onStudentEnquiry, pathname }) {
     ? null
     : pathname === "/contact"
       ? { label: "Review services", to: "/services" }
-      : { label: "Start a project", to: "/contact" };
+      : { label: "Start a project", to: "/#student-connect" };
 
   const themeLabel = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
   const ThemeIcon = theme === "dark" ? SunMedium : MoonStar;

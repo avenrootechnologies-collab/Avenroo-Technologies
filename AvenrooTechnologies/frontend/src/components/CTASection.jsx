@@ -45,7 +45,7 @@ export default function CTASection() {
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Link
-                  to="/contact"
+                  to="/#student-connect"
                   className="brand-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"
                 >
                   Start the brief
