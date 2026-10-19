@@ -230,6 +230,10 @@ select {
   background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
 }
 
+.mx-auto.grid > * {
+  min-width: 0;
+}
+
 .nav-brand {
   display: flex;
   align-items: center;
@@ -319,6 +323,10 @@ select {
 .view-switch--compact {
   padding: 0.48rem 0.68rem;
   font-size: 0.72rem;
+}
+
+.view-switch--desktop {
+  display: none;
 }
 
 .student-carousel {
@@ -501,15 +509,24 @@ html[data-theme="dark"] .student-form-feedback--error {
   }
 }
 
-@media (max-width: 400px) {
+@media (min-width: 80rem) {
+  .view-switch--desktop {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 1023px) {
   .student-modal-dialog {
-    max-height: calc(100dvh - 1rem);
+    max-height: none;
   }
 
   .student-modal-layout {
-    max-height: calc(100dvh - 1rem);
+    max-height: none;
+    overflow: visible;
   }
+}
 
+@media (max-width: 400px) {
   .student-modal-form .input-surface {
     padding-inline: 0.8rem;
   }
@@ -730,6 +747,8 @@ html[data-theme="dark"] .student-form-feedback--error {
     box-shadow 180ms ease,
     border-color 180ms ease,
     background 180ms ease;
+  max-width: 100%;
+  white-space: normal;
 }
 
 .brand-button {
@@ -737,7 +756,6 @@ html[data-theme="dark"] .student-form-feedback--error {
   background: linear-gradient(135deg, #72e5d7, #18b7a1);
   color: #08161e;
   box-shadow: var(--button-shadow);
-  white-space: nowrap;
 }
 
 .brand-button:hover {
@@ -749,7 +767,6 @@ html[data-theme="dark"] .student-form-feedback--error {
   border: 1px solid var(--border-strong);
   background: var(--surface-strong);
   color: var(--text-strong);
-  white-space: nowrap;
 }
 
 .secondary-button:hover {

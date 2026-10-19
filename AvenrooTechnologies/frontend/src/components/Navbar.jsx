@@ -100,6 +100,18 @@ function NavbarContent({ onStudentEnquiry, pathname }) {
   }, [open]);
 
   useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
+  useEffect(() => {
     const desktopViewport = window.matchMedia("(min-width: 1280px)");
     const closeMobileMenu = (event) => {
       if (event.matches) {
@@ -169,7 +181,7 @@ function NavbarContent({ onStudentEnquiry, pathname }) {
 
           <Link
             to={switchPath}
-            className="view-switch hidden xl:inline-flex"
+            className="view-switch view-switch--desktop"
             aria-label={`Switch to ${switchLabel.toLowerCase()} website`}
           >
             {switchLabel}

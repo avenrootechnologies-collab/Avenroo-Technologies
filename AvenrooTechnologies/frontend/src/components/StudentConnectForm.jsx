@@ -102,7 +102,7 @@ export default function StudentConnectForm({ isOpen, onClose, intent = "enquiry"
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.55 }}
-          className="student-modal-aside flex flex-col justify-between rounded-[22px] p-5 shadow-[var(--shadow-panel)] sm:rounded-[28px] sm:p-8 lg:p-9"
+          className="student-modal-aside order-2 flex flex-col justify-between rounded-[22px] p-5 shadow-[var(--shadow-panel)] sm:rounded-[28px] sm:p-8 lg:order-1 lg:p-9"
         >
           <div>
             <p className="eyebrow">Connect with us</p>
@@ -121,7 +121,7 @@ export default function StudentConnectForm({ isOpen, onClose, intent = "enquiry"
           viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.55, delay: 0.08 }}
           onSubmit={handleSubmit}
-          className="student-modal-form rounded-[22px] p-4 sm:rounded-[28px] sm:p-7 lg:p-8"
+          className="student-modal-form order-1 rounded-[22px] p-4 sm:rounded-[28px] sm:p-7 lg:order-2 lg:p-8"
         >
           <div className="mb-6">
             <p className="eyebrow">Student programs</p>
@@ -186,3 +186,4 @@ export default function StudentConnectForm({ isOpen, onClose, intent = "enquiry"
     document.body,
   );
 }
+

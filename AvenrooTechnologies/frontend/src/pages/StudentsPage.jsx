@@ -85,7 +85,7 @@ const projectIdeas = [
 export default function StudentsPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isConnectRequested, setIsConnectRequested] = useState(true);
+  const [isConnectRequested, setIsConnectRequested] = useState(false);
   const [requestedFormIntent, setRequestedFormIntent] = useState("enquiry");
   const [activeSlide, setActiveSlide] = useState(0);
   const hasStudentFormHash = ["#student-connect", "#student-internship"].includes(location.hash);
