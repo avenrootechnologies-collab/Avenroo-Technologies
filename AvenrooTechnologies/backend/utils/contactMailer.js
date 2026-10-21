@@ -41,6 +41,24 @@ const getTransportConfig = () => {
   };
 };
 
+export const getOutboundMailerStatus = () => {
+  const transport = getTransportConfig();
+  const fromEmail = process.env.SMTP_FROM_EMAIL?.trim() || process.env.SMTP_USER?.trim();
+  const authRequired = process.env.SMTP_REQUIRE_AUTH
+    ? booleanFromEnv(process.env.SMTP_REQUIRE_AUTH)
+    : true;
+
+  if (!transport) return { configured: false, reason: "SMTP_HOST is not configured." };
+  if (authRequired && !process.env.SMTP_USER?.trim()) {
+    return { configured: false, reason: "SMTP_USER is not configured." };
+  }
+  if (authRequired && !process.env.SMTP_PASS?.trim()) {
+    return { configured: false, reason: "SMTP_PASS is not configured." };
+  }
+  if (!fromEmail) return { configured: false, reason: "SMTP_FROM_EMAIL or SMTP_USER is not configured." };
+  return { configured: true, fromEmail };
+};
+
 export const getContactMailerStatus = () => {
   const transport = getTransportConfig();
   const recipients = getRecipients();
@@ -224,6 +242,29 @@ export const sendContactNotification = async (contact) => {
     rejectedCount: info.rejected?.length || 0,
   });
 
+  return { sent: true, messageId: info.messageId };
+};
+
+export const sendCampaignEmail = async ({ to, subject, message }) => {
+  const status = getOutboundMailerStatus();
+  if (!status.configured) throw new Error(status.reason);
+
+  const transport = getTransportConfig();
+  const transporter = nodemailer.createTransport(transport);
+  const { email: fromEmail, name: fromName } = getSender();
+  const info = await transporter.sendMail({
+    from: { name: fromName, address: fromEmail },
+    to,
+    replyTo: process.env.CONTACT_TO_EMAIL?.split(",")[0]?.trim() || fromEmail,
+    subject: cleanHeaderValue(subject),
+    text: message,
+  });
+
+  logger.info("campaign_mailer.send.completed", {
+    messageId: info.messageId,
+    acceptedCount: info.accepted?.length || 0,
+    rejectedCount: info.rejected?.length || 0,
+  });
   return { sent: true, messageId: info.messageId };
 };
 

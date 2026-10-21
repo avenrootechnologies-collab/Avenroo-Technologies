@@ -15,6 +15,7 @@ const Home = lazy(() => import("./components/Home"));
 const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const StudentsPage = lazy(() => import("./pages/StudentsPage"));
 const PortfolioPage = lazy(() => import("./pages/PortfolioPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 function StudentRoute() {
   const [isReady, setIsReady] = useState(false);
@@ -82,6 +83,7 @@ function App() {
             <Route path="/students" element={<Navigate to="/" replace />} />
             <Route path="/contact" element={<Navigate to="/#student-connect" replace />} />
             <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

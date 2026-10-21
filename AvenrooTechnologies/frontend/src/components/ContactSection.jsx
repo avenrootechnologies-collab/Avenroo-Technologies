@@ -13,8 +13,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import API from "../api/axios";
+import { CONTACT_EMAIL } from "../config/contact";
 
-const defaultContactEmail = "avenrootechnologies@gmail.com";
 const defaultWhatsAppMessage =
   "Hi Avenroo Technologies, I want to discuss a project.";
 
@@ -91,7 +91,7 @@ export default function ContactSection() {
     import.meta.env.VITE_WHATSAPP_NUMBER,
     import.meta.env.VITE_WHATSAPP_MESSAGE || defaultWhatsAppMessage,
   );
-  const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || defaultContactEmail;
+  const contactEmail = CONTACT_EMAIL;
   const contactPhone = import.meta.env.VITE_CONTACT_PHONE;
   const quickContacts = [
     {

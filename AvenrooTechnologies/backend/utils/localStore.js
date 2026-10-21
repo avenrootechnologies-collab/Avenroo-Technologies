@@ -11,6 +11,10 @@ export const LOCAL_CONTACTS_FILE =
   process.env.LOCAL_CONTACTS_FILE || path.join(dataDirectory, "contacts.local.json");
 export const LOCAL_SERVICES_FILE =
   process.env.LOCAL_SERVICES_FILE || path.join(dataDirectory, "services.local.json");
+export const LOCAL_OPERATIONS_SHEET_FILE =
+  process.env.LOCAL_OPERATIONS_SHEET_FILE || path.join(dataDirectory, "operations-sheet.local.json");
+export const LOCAL_CAMPAIGNS_FILE =
+  process.env.LOCAL_CAMPAIGNS_FILE || path.join(dataDirectory, "campaigns.local.json");
 
 const cloneCollection = (items) => JSON.parse(JSON.stringify(items));
 

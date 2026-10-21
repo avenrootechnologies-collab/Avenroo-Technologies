@@ -20,4 +20,16 @@ const API = axios.create({
   },
 });
 
+API.interceptors.request.use((config) => {
+  const adminKey = window.sessionStorage.getItem("avenroo-admin-key");
+
+  if (adminKey) {
+    config.headers["x-admin-api-key"] = adminKey;
+  } else if (config.headers["x-admin-api-key"]) {
+    delete config.headers["x-admin-api-key"];
+  }
+
+  return config;
+});
+
 export default API;

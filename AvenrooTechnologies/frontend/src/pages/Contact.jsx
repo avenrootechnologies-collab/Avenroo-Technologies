@@ -8,8 +8,9 @@ import Spotlight from "../components/Spotlight";
 import { editorialPhotos } from "../content/visuals";
 import EditorialPhotoCard from "../components/EditorialPhotoCard";
 import PosterCard from "../components/PosterCard";
+import { CONTACT_EMAIL } from "../config/contact";
 
-const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "avenrootechnologies@gmail.com";
+const contactEmail = CONTACT_EMAIL;
 
 export default function ContactPage() {
   return (

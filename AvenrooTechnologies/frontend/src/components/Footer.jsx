@@ -14,12 +14,13 @@ import {
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import BrandLogo from "./BrandLogo";
+import { CONTACT_EMAIL } from "../config/contact";
 
 const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || "";
 const whatsappMessage =
   import.meta.env.VITE_WHATSAPP_MESSAGE ||
   "Hi Avenroo Technologies, I want to discuss a website, app, automation, or security project.";
-const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || "avenrootechnologies@gmail.com";
+const contactEmail = CONTACT_EMAIL;
 const contactPhone = import.meta.env.VITE_CONTACT_PHONE || "+91 98390 79570";
 const linkedinUrl =
   import.meta.env.VITE_LINKEDIN_URL || "https://www.linkedin.com/company/avenroo-technologies/";
