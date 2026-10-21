@@ -41,8 +41,8 @@ const databaseRequired = (res) => {
 };
 
 const validatePassword = (password) => {
-  if (typeof password !== "string" || password.length < 12 || password.length > 128 || Buffer.byteLength(password, "utf8") > 1024) {
-    return "Use a password between 12 and 128 characters.";
+  if (typeof password !== "string" || password.length < 1 || password.length > 128 || Buffer.byteLength(password, "utf8") > 1024) {
+    return "Use a password between 1 and 128 characters.";
   }
   return "";
 };

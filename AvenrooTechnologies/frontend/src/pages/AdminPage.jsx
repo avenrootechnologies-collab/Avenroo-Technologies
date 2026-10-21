@@ -221,9 +221,9 @@ function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, load
             <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-email">Work email</label>
             <input id="admin-email" className="admin-login-input mt-2" type="email" autoComplete="email" required readOnly={Boolean(invite) || (bootstrap && isRegistering)} value={email} onChange={(event) => setEmail(event.target.value)} />
             <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-password">Password</label>
-            <input id="admin-password" className="admin-login-input mt-2" type="password" autoComplete={isRegistering ? "new-password" : "current-password"} minLength={isRegistering ? 12 : 1} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} />
-            {isRegistering && <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-confirm-password">Confirm password<input id="admin-confirm-password" className="admin-login-input mt-2" type="password" autoComplete="new-password" minLength={12} maxLength={128} required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} /></label>}
-            {isRegistering && <p className="mt-2 text-xs text-slate-400">Use at least 12 characters.</p>}
+            <input id="admin-password" className="admin-login-input mt-2" type="password" autoComplete={isRegistering ? "new-password" : "current-password"} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} />
+            {isRegistering && <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-confirm-password">Confirm password<input id="admin-confirm-password" className="admin-login-input mt-2" type="password" autoComplete="new-password" maxLength={128} required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} /></label>}
+            {isRegistering && <p className="mt-2 text-xs text-slate-400">Use any password up to 128 characters.</p>}
           </>
         )}
         {inviteError && <p role="alert" className="mt-3 text-sm font-medium text-rose-600">{inviteError}</p>}
