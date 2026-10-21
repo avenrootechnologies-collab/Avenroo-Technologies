@@ -83,6 +83,8 @@
 .admin-auth-switch:hover { color: #0c766a; text-decoration: underline; }
 .admin-auth-notice { display: flex; gap: 0.7rem; align-items: flex-start; border: 1px solid #cfe8e0; border-radius: 0.9rem; background: #eff9f5; padding: 0.9rem; color: #42645f; font-size: 0.78rem; line-height: 1.55; }
 .admin-auth-notice svg { flex: none; color: #168d7d; }
+.admin-auth-notice--warning { border-color: #efd7c4; background: #fff7ef; color: #78543c; }
+.admin-auth-notice--warning svg { color: #b56b36; }
 
 .admin-primary-button,
 .admin-secondary-button {

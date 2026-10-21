@@ -209,6 +209,7 @@ function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, load
               : "Finish setting up your invited account. Confirm your email before signing in."
             : "Sign in to manage enquiries, contact data, services, and email campaigns."}
         </p>
+        {isRegistering && authStatus?.verificationEmail?.configured === false && <div className="admin-auth-notice admin-auth-notice--warning mt-5"><AlertCircle size={18} /><span>Email confirmation is not ready: {authStatus.verificationEmail.reason}</span></div>}
         {isRegistering && !canRegister ? (
           <div className="admin-auth-notice mt-6">
             <ShieldCheck size={18} />
@@ -228,7 +229,7 @@ function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, load
         {inviteError && <p role="alert" className="mt-3 text-sm font-medium text-rose-600">{inviteError}</p>}
         {message && <p role="status" className="mt-3 rounded-xl bg-emerald-50 p-3 text-sm font-medium text-emerald-800">{message}</p>}
         {(error || formError) && <p role="alert" className="mt-3 text-sm font-medium text-rose-600">{formError || error}</p>}
-        {(!isRegistering || canRegister) && <button className="admin-primary-button mt-5 w-full justify-center" disabled={loading} type="submit">
+        {(!isRegistering || canRegister) && <button className="admin-primary-button mt-5 w-full justify-center" disabled={loading || (isRegistering && authStatus?.verificationEmail?.configured === false)} type="submit">
           <ShieldCheck size={17} /> {loading ? (isRegistering ? "Creating account…" : "Signing in…") : (isRegistering ? "Create account" : "Sign in")}
         </button>}
         {!invite && <button className="admin-auth-switch mt-5 w-full" type="button" onClick={() => { setMode(isRegistering ? "login" : "register"); setFormError(""); }}>
