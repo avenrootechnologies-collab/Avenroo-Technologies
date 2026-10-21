@@ -1,54 +1,34 @@
-import crypto from "node:crypto";
-import { logRequestStep } from "../utils/logger.js";
+import AdminSession from "../models/AdminSession.js";
+import { isDatabaseReady } from "../config/db.js";
+import { clearAdminSessionCookie, hashOpaqueToken, readAdminSessionCookie } from "../utils/adminSecurity.js";
 
-const weakAdminKeys = new Set([
-  "admin",
-  "changeme",
-  "password",
-  "replace-with-a-long-random-admin-key",
-  "secret",
-]);
-
-const getProvidedKey = (req) => {
-  const headerKey = req.get("x-admin-api-key");
-
-  if (headerKey) {
-    return headerKey;
+export const requireAdminAccess = async (req, res, next) => {
+  if (!isDatabaseReady()) {
+    return res.status(503).json({ message: "Admin account storage is unavailable. Please try again shortly." });
   }
 
-  const authHeader = req.get("authorization") || "";
-  const [scheme, token] = authHeader.split(" ");
-
-  return scheme?.toLowerCase() === "bearer" ? token : "";
-};
-
-const safeEqual = (left, right) => {
-  const leftBuffer = Buffer.from(left);
-  const rightBuffer = Buffer.from(right);
-
-  return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
-};
-
-export const requireAdminApiKey = (req, res, next) => {
-  const configuredKey = process.env.ADMIN_API_KEY || "";
-  const normalizedKey = configuredKey.trim().toLowerCase();
-  const isProduction = process.env.NODE_ENV === "production";
-
-  if (!configuredKey) {
-    logRequestStep(req, "error", "admin_auth.missing_configured_key");
-    return res.status(503).json({ message: "Admin API key is not configured." });
+  let token = "";
+  try {
+    token = readAdminSessionCookie(req);
+  } catch {
+    token = "";
+  }
+  if (!token) {
+    clearAdminSessionCookie(res);
+    return res.status(401).json({ message: "Sign in to access the admin panel." });
   }
 
-  if (isProduction && (configuredKey.length < 32 || weakAdminKeys.has(normalizedKey))) {
-    logRequestStep(req, "error", "admin_auth.weak_configured_key");
-    return res.status(503).json({ message: "Admin API key is not securely configured." });
+  try {
+    const session = await AdminSession.findOne({ tokenHash: hashOpaqueToken(token), expiresAt: { $gt: new Date() } }).populate("userId");
+    const user = session?.userId;
+    if (!session || !user || !user.isActive || !user.emailVerifiedAt) {
+      clearAdminSessionCookie(res);
+      return res.status(401).json({ message: "Your admin session has expired. Sign in again." });
+    }
+    req.adminSession = session;
+    req.adminUser = user;
+    return next();
+  } catch (error) {
+    return next(error);
   }
-
-  if (!safeEqual(getProvidedKey(req), configuredKey)) {
-    logRequestStep(req, "warn", "admin_auth.invalid_key");
-    return res.status(401).json({ message: "Valid admin API key is required." });
-  }
-
-  logRequestStep(req, "debug", "admin_auth.authorized");
-  return next();
 };

@@ -79,6 +79,11 @@
   box-shadow: 0 0 0 3px rgba(40, 187, 167, 0.13);
 }
 
+.admin-auth-switch { color: #138d7f; font-size: 0.78rem; font-weight: 800; }
+.admin-auth-switch:hover { color: #0c766a; text-decoration: underline; }
+.admin-auth-notice { display: flex; gap: 0.7rem; align-items: flex-start; border: 1px solid #cfe8e0; border-radius: 0.9rem; background: #eff9f5; padding: 0.9rem; color: #42645f; font-size: 0.78rem; line-height: 1.55; }
+.admin-auth-notice svg { flex: none; color: #168d7d; }
+
 .admin-primary-button,
 .admin-secondary-button {
   display: inline-flex;
@@ -463,6 +468,21 @@
 .admin-system-banner strong { display: block; color: #326b60; font-size: 0.78rem; }
 .admin-system-banner p { margin: 0.2rem 0 0; color: #839a93; font-size: 0.64rem; }
 .admin-system-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0.9rem; margin-top: 1rem; }
+.admin-team-layout { display: grid; gap: 1rem; }
+.admin-invite-form { display: grid; gap: 0.6rem; max-width: 48rem; margin-top: 1.4rem; }
+.admin-invite-form > label { color: #344f56; font-size: 0.76rem; font-weight: 800; }
+.admin-invite-form > div { display: flex; gap: 0.65rem; }
+.admin-invite-form input { min-width: 0; flex: 1; border: 1px solid #dce7e3; border-radius: 0.8rem; background: #fbfdfc; padding: 0.72rem 0.85rem; outline: none; }
+.admin-invite-form input:focus { border-color: #28bba7; box-shadow: 0 0 0 3px rgba(40,187,167,0.13); }
+.admin-invite-form small { color: #89999b; font-size: 0.67rem; line-height: 1.5; }
+.admin-team-list { display: grid; margin-top: 0.9rem; }
+.admin-team-list article { display: flex; min-width: 0; align-items: center; gap: 0.8rem; border-bottom: 1px solid #edf1ef; padding: 0.8rem 0; }
+.admin-team-list article:last-child { border-bottom: 0; }
+.admin-team-list article > div { display: grid; min-width: 0; flex: 1; gap: 0.18rem; }
+.admin-team-list article strong { overflow: hidden; color: #304c53; font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
+.admin-team-list article small { overflow: hidden; color: #87989a; font-size: 0.68rem; text-overflow: ellipsis; white-space: nowrap; }
+.admin-team-avatar { display: grid; width: 2.4rem; height: 2.4rem; flex: none; place-items: center; border-radius: 0.8rem; background: #e5f6f0; color: #168d7d; font-size: 0.82rem; font-weight: 800; }
+.admin-team-avatar--invite { background: #f1f4fa; color: #697ca1; }
 .admin-system-card { border: 1px solid #e7eeeb; border-radius: 1rem; background: #fff; padding: 1.1rem; }
 .admin-system-card > div { display: flex; align-items: center; justify-content: space-between; }
 .admin-system-card h2 { margin: 1rem 0 0; font-size: 0.85rem; }
@@ -548,6 +568,10 @@
   .admin-send-footer { align-items: flex-start; flex-direction: column; }
   .admin-send-footer .admin-primary-button { width: 100%; justify-content: center; }
   .admin-service-fields { grid-template-columns: 1fr; }
+  .admin-invite-form > div { align-items: stretch; flex-direction: column; }
+  .admin-invite-form .admin-primary-button { justify-content: center; }
+  .admin-team-list article { gap: 0.55rem; }
+  .admin-team-list .admin-status { max-width: 6rem; text-align: center; }
   .admin-service-description { grid-column: auto; }
   .admin-service-actions { flex-wrap: wrap; }
   .admin-service-actions button { flex: 1; justify-content: center; }

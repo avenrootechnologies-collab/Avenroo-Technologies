@@ -28,3 +28,9 @@ export const adminApiLimiter = createLimiter({
   limit: isProduction ? 60 : 240,
   message: "Too many admin requests. Please try again later.",
 });
+
+export const authLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000,
+  limit: isProduction ? 20 : 100,
+  message: "Too many sign-in or registration attempts. Please wait and try again.",
+});

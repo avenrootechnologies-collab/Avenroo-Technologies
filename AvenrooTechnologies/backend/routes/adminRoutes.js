@@ -5,20 +5,25 @@ import {
   saveOperationsSheet,
   sendCampaign,
 } from "../controllers/adminController.js";
-import { requireAdminApiKey } from "../middleware/adminAuth.js";
+import { getAdminAccountLists, inviteAdmin } from "../controllers/authController.js";
+import { requireAdminAccess } from "../middleware/adminAuth.js";
 import { adminApiLimiter } from "../middleware/rateLimiters.js";
-import { getContactMailerStatus, getOutboundMailerStatus } from "../utils/contactMailer.js";
+import { getAdminAuthMailerStatus, getContactMailerStatus, getOutboundMailerStatus } from "../utils/contactMailer.js";
 import { isDatabaseReady } from "../config/db.js";
 
 const router = express.Router();
-router.use(adminApiLimiter, requireAdminApiKey);
+router.use(adminApiLimiter, requireAdminAccess);
 
 router.get("/session", (_req, res) => res.json({
   authorized: true,
+  user: { name: _req.adminUser.name, email: _req.adminUser.email, role: _req.adminUser.role },
   emailNotifications: getContactMailerStatus(),
   campaignEmail: getOutboundMailerStatus(),
+  accountEmail: getAdminAuthMailerStatus(),
   database: isDatabaseReady() ? "connected" : "local-file fallback",
 }));
+router.get("/users", getAdminAccountLists);
+router.post("/invites", inviteAdmin);
 router.get("/sheet", getOperationsSheet);
 router.put("/sheet", saveOperationsSheet);
 router.get("/campaigns", getCampaignHistory);

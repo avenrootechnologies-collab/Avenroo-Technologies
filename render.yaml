@@ -15,15 +15,15 @@ services:
       - key: LOG_LEVEL
         value: info
       - key: CLIENT_URLS
-        sync: false
+        value: https://avenroo-technologies.vercel.app
       - key: HEALTH_INCLUDE_DETAILS
         value: "true"
       - key: ALLOW_PRODUCTION_LOCAL_CONTACT_STORAGE
         value: "false"
       - key: MONGO_URI
         sync: false
-      - key: ADMIN_API_KEY
-        generateValue: true
+      - key: ADMIN_APP_URL
+        value: https://avenroo-technologies.vercel.app
       - key: CONTACT_BRAND_NAME
         value: Avenroo Technologies
       - key: CONTACT_TO_EMAIL

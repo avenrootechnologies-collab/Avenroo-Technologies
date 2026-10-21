@@ -1,0 +1,15 @@
+import mongoose from "mongoose";
+
+const adminUserSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true, maxlength: 100 },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true, maxlength: 254 },
+    passwordHash: { type: String, required: true, select: false },
+    role: { type: String, enum: ["owner", "admin"], default: "admin" },
+    emailVerifiedAt: { type: Date, default: null },
+    isActive: { type: Boolean, default: true },
+  },
+  { timestamps: true },
+);
+
+export default mongoose.model("AdminUser", adminUserSchema);

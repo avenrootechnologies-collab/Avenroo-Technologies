@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
   AlertCircle,
@@ -21,17 +21,18 @@ import {
   ShieldCheck,
   Trash2,
   Upload,
+  UserPlus,
 } from "lucide-react";
 import API from "../api/axios";
 import "./AdminPage.css";
 
-const ADMIN_KEY = "avenroo-admin-key";
 const navItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "sheet", label: "Contact sheet", icon: FileSpreadsheet },
   { id: "campaigns", label: "Email campaigns", icon: Mail },
   { id: "services", label: "Services", icon: BriefcaseBusiness },
+  { id: "team", label: "Team access", icon: UserPlus },
   { id: "system", label: "System status", icon: Activity },
 ];
 
@@ -168,39 +169,72 @@ function StatCard({ label, value, detail, icon: Icon, tone = "mint" }) {
   );
 }
 
-function AdminLogin({ onLogin, loading, error }) {
-  const [apiKey, setApiKey] = useState("");
+function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, loading, error, message }) {
+  const bootstrap = Boolean(authStatus?.bootstrapAvailable);
+  const [mode, setMode] = useState(bootstrap || invite ? "register" : "login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(invite?.email || (bootstrap ? "connect@avenroo.in" : ""));
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formError, setFormError] = useState("");
+
+  const isRegistering = mode === "register" && !message;
+  const canRegister = bootstrap || Boolean(invite);
+
   return (
     <main className="admin-login min-h-screen px-4 py-10">
       <form
         className="admin-login-card"
-        onSubmit={(event) => { event.preventDefault(); onLogin(apiKey); }}
+        onSubmit={(event) => {
+          event.preventDefault();
+          setFormError("");
+          if (isRegistering) {
+            if (password !== confirmPassword) {
+              setFormError("The passwords do not match.");
+              return;
+            }
+            onRegister({ name, email, password, inviteToken: invite?.token || "" });
+          } else {
+            onLogin(email, password);
+          }
+        }}
       >
         <div className="admin-login-mark">AV</div>
         <p className="admin-eyebrow mt-7">Avenroo Technologies</p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight">Operations, in one place.</h1>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight">{isRegistering ? "Create your admin account." : "Operations, in one place."}</h1>
         <p className="mt-3 text-sm leading-6 text-slate-500">
-          Sign in with the admin key configured for your API to manage enquiries, contact data, and email campaigns.
+          {isRegistering
+            ? bootstrap
+              ? "Set up the owner account. A confirmation link will be sent to the official Avenroo inbox."
+              : "Finish setting up your invited account. Confirm your email before signing in."
+            : "Sign in to manage enquiries, contact data, services, and email campaigns."}
         </p>
-        <label className="mt-7 block text-sm font-semibold text-slate-700" htmlFor="admin-key">Admin API key</label>
-        <input
-          id="admin-key"
-          autoComplete="current-password"
-          autoFocus
-          required
-          type="password"
-          value={apiKey}
-          onChange={(event) => setApiKey(event.target.value)}
-          placeholder="Enter your admin key"
-          className="admin-login-input mt-2"
-        />
-        {error && <p role="alert" className="mt-3 text-sm font-medium text-rose-600">{error}</p>}
-        <button className="admin-primary-button mt-5 w-full justify-center" disabled={loading} type="submit">
-          <ShieldCheck size={17} /> {loading ? "Checking access…" : "Open admin panel"}
-        </button>
-        <p className="mt-5 text-center text-xs leading-5 text-slate-400">
-          Your key stays in this browser session and is cleared when you sign out.
-        </p>
+        {isRegistering && !canRegister ? (
+          <div className="admin-auth-notice mt-6">
+            <ShieldCheck size={18} />
+            <span>New accounts are invitation-only. Ask an active administrator to send you an invitation.</span>
+          </div>
+        ) : (
+          <>
+            {isRegistering && <label className="mt-6 block text-sm font-semibold text-slate-700" htmlFor="admin-name">Your name<input id="admin-name" className="admin-login-input mt-2" autoComplete="name" maxLength={100} required value={name} onChange={(event) => setName(event.target.value)} /></label>}
+            <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-email">Work email</label>
+            <input id="admin-email" className="admin-login-input mt-2" type="email" autoComplete="email" required readOnly={Boolean(invite) || (bootstrap && isRegistering)} value={email} onChange={(event) => setEmail(event.target.value)} />
+            <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-password">Password</label>
+            <input id="admin-password" className="admin-login-input mt-2" type="password" autoComplete={isRegistering ? "new-password" : "current-password"} minLength={isRegistering ? 12 : 1} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} />
+            {isRegistering && <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-confirm-password">Confirm password<input id="admin-confirm-password" className="admin-login-input mt-2" type="password" autoComplete="new-password" minLength={12} maxLength={128} required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} /></label>}
+            {isRegistering && <p className="mt-2 text-xs text-slate-400">Use at least 12 characters.</p>}
+          </>
+        )}
+        {inviteError && <p role="alert" className="mt-3 text-sm font-medium text-rose-600">{inviteError}</p>}
+        {message && <p role="status" className="mt-3 rounded-xl bg-emerald-50 p-3 text-sm font-medium text-emerald-800">{message}</p>}
+        {(error || formError) && <p role="alert" className="mt-3 text-sm font-medium text-rose-600">{formError || error}</p>}
+        {(!isRegistering || canRegister) && <button className="admin-primary-button mt-5 w-full justify-center" disabled={loading} type="submit">
+          <ShieldCheck size={17} /> {loading ? (isRegistering ? "Creating account…" : "Signing in…") : (isRegistering ? "Create account" : "Sign in")}
+        </button>}
+        {!invite && <button className="admin-auth-switch mt-5 w-full" type="button" onClick={() => { setMode(isRegistering ? "login" : "register"); setFormError(""); }}>
+          {isRegistering ? "Already have an account? Sign in" : bootstrap ? "Set up the owner account" : "Create account or accept an invitation"}
+        </button>}
+        {isRegistering && bootstrap && <p className="mt-4 text-center text-xs leading-5 text-slate-400">The first owner account must use connect@avenroo.in.</p>}
       </form>
     </main>
   );
@@ -217,10 +251,20 @@ function EmptyState({ icon: Icon, title, copy }) {
 }
 
 export default function AdminPage() {
+  const authInitializationStarted = useRef(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [authStatus, setAuthStatus] = useState(null);
+  const [authMessage, setAuthMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [inviteInfo, setInviteInfo] = useState(null);
+  const [inviteError, setInviteError] = useState("");
+  const [teamUsers, setTeamUsers] = useState([]);
+  const [teamInvites, setTeamInvites] = useState([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [isInviting, setIsInviting] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [toast, setToast] = useState("");
   const [health, setHealth] = useState(null);
@@ -257,9 +301,14 @@ export default function AdminPage() {
       API.get("/admin/sheet"),
       API.get("/admin/campaigns"),
       API.get("/admin/session"),
+      API.get("/admin/users"),
     ]);
 
-    const [healthResult, contactResult, serviceResult, sheetResult, campaignResult, sessionResult] = results;
+    const [healthResult, contactResult, serviceResult, sheetResult, campaignResult, sessionResult, teamResult] = results;
+    if (results.some((result) => result.status === "rejected" && result.reason?.response?.status === 401)) {
+      setIsAuthorized(false);
+      setCurrentUser(null);
+    }
     if (healthResult.status === "fulfilled") setHealth(healthResult.value.data);
     if (contactResult.status === "fulfilled") {
       setContacts(contactResult.value.data?.items || []);
@@ -280,56 +329,126 @@ export default function AdminPage() {
       setSheetStorage(sheetResult.value.data?.storage || "");
     }
     if (campaignResult.status === "fulfilled") setCampaigns(campaignResult.value.data?.items || []);
-    if (sessionResult.status === "fulfilled") setSessionInfo(sessionResult.value.data);
+    if (sessionResult.status === "fulfilled") {
+      setSessionInfo(sessionResult.value.data);
+      setCurrentUser(sessionResult.value.data?.user || null);
+    }
+    if (teamResult.status === "fulfilled") {
+      setTeamUsers(teamResult.value.data?.users || []);
+      setTeamInvites(teamResult.value.data?.invites || []);
+    }
     setIsRefreshing(false);
   }, []);
 
-  const verifySession = useCallback(async (key) => {
-    await API.get("/admin/session", { headers: { "x-admin-api-key": key } });
-    setIsAuthorized(true);
-    setLoginError("");
-    await loadData();
-  }, [loadData]);
-
   useEffect(() => {
-    let active = true;
-    const savedKey = window.sessionStorage.getItem(ADMIN_KEY);
-    if (!savedKey) {
-      setIsCheckingSession(false);
-      return () => { active = false; };
-    }
-    API.get("/admin/session", { headers: { "x-admin-api-key": savedKey } })
-      .then(() => {
-        if (active) {
-          setIsAuthorized(true);
-          loadData();
+    if (authInitializationStarted.current) return;
+    authInitializationStarted.current = true;
+    const initializeAuth = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const verificationToken = params.get("verify");
+      const inviteToken = params.get("invite");
+      try {
+        const status = await API.get("/auth/status");
+        setAuthStatus(status.data);
+      } catch (error) {
+        setLoginError(error.response?.data?.message || "Could not reach the account service.");
+      }
+
+      if (inviteToken) {
+        try {
+          const response = await API.get(`/auth/invites/${encodeURIComponent(inviteToken)}`);
+          setInviteInfo({ ...response.data, token: inviteToken });
+          params.delete("invite");
+          const query = params.toString();
+          window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+        } catch (error) {
+          setInviteError(error.response?.data?.message || "This invitation is invalid or has expired.");
         }
-      })
-      .catch(() => window.sessionStorage.removeItem(ADMIN_KEY))
-      .finally(() => { if (active) setIsCheckingSession(false); });
-    return () => { active = false; };
+      }
+
+      if (verificationToken) {
+        try {
+          const response = await API.post("/auth/verify", { token: verificationToken });
+          setAuthMessage(response.data.message || "Email confirmed. You can now sign in.");
+          params.delete("verify");
+          const query = params.toString();
+          window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+        } catch (error) {
+          setLoginError(error.response?.data?.message || "Could not confirm this email address.");
+        }
+      }
+
+      try {
+        const response = await API.get("/auth/me");
+        setCurrentUser(response.data.user);
+        setIsAuthorized(true);
+        await loadData();
+      } catch {
+        setIsAuthorized(false);
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+    initializeAuth();
   }, [loadData]);
 
-  const handleLogin = async (key) => {
+  const handleLogin = async (email, password) => {
     setIsLoggingIn(true);
     setLoginError("");
-    window.sessionStorage.setItem(ADMIN_KEY, key.trim());
     try {
-      await verifySession(key.trim());
+      const response = await API.post("/auth/login", { email, password });
+      setCurrentUser(response.data.user);
+      setIsAuthorized(true);
+      setAuthMessage("");
+      await loadData();
     } catch (error) {
-      window.sessionStorage.removeItem(ADMIN_KEY);
-      setLoginError(error.response?.data?.message || "Could not verify that key. Check it and try again.");
+      setLoginError(error.response?.data?.message || "Could not sign in. Check your email and password.");
     } finally {
       setIsLoggingIn(false);
       setIsCheckingSession(false);
     }
   };
 
-  const handleLogout = () => {
-    window.sessionStorage.removeItem(ADMIN_KEY);
+  const handleRegister = async (account) => {
+    setIsLoggingIn(true);
+    setLoginError("");
+    setAuthMessage("");
+    try {
+      const response = await API.post("/auth/register", account);
+      setAuthMessage(response.data.message || "Check your inbox for the confirmation email.");
+      setInviteInfo(null);
+    } catch (error) {
+      setLoginError(error.response?.data?.message || "Could not create the account.");
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await API.post("/auth/logout");
+    } catch {
+      // Locally clear the session UI even if the API is unavailable.
+    }
     setIsAuthorized(false);
+    setCurrentUser(null);
     setSessionInfo(null);
     setActiveTab("overview");
+  };
+
+  const handleInvite = async (event) => {
+    event.preventDefault();
+    setIsInviting(true);
+    try {
+      const response = await API.post("/admin/invites", { email: inviteEmail });
+      setInviteEmail("");
+      announce(response.data.message || "Invitation sent.");
+      await loadData();
+    } catch (error) {
+      announce(error.response?.data?.message || "Could not send this invitation.");
+    } finally {
+      setIsInviting(false);
+    }
   };
 
   const handleContactStatus = async (contactId, status) => {
@@ -453,7 +572,7 @@ export default function AdminPage() {
   if (isCheckingSession) {
     return <main className="admin-login min-h-screen"><div className="admin-session-loader">Loading admin panel…</div></main>;
   }
-  if (!isAuthorized) return <AdminLogin onLogin={handleLogin} loading={isLoggingIn} error={loginError} />;
+  if (!isAuthorized) return <AdminLogin authStatus={authStatus} invite={inviteInfo} inviteError={inviteError} onLogin={handleLogin} onRegister={handleRegister} loading={isLoggingIn} error={loginError} message={authMessage} />;
 
   const activeTitle = navItems.find((item) => item.id === activeTab)?.label || "Overview";
   const newEnquiries = contacts.filter((contact) => contact.status === "new").length;
@@ -494,7 +613,7 @@ export default function AdminPage() {
             <h1>{activeTitle}</h1>
           </div>
           <div className="admin-topbar-actions">
-            <div className="admin-user-chip"><span className="admin-user-avatar">A</span><span><strong>Administrator</strong><small>Secure session</small></span></div>
+            <div className="admin-user-chip"><span className="admin-user-avatar">{(currentUser?.name || "A").slice(0, 1).toUpperCase()}</span><span><strong>{currentUser?.name || "Administrator"}</strong><small>{currentUser?.email || "Secure session"}</small></span></div>
             <button className="admin-icon-button" onClick={loadData} disabled={isRefreshing} aria-label="Refresh dashboard" title="Refresh dashboard">
               <RefreshCw size={17} className={isRefreshing ? "animate-spin" : ""} />
             </button>
@@ -598,6 +717,28 @@ export default function AdminPage() {
             </section>
           )}
 
+          {activeTab === "team" && (
+            <div className="admin-team-layout">
+              <section className="admin-panel-card">
+                <div className="admin-panel-heading"><div><p className="admin-eyebrow">Account security</p><h2>Team access</h2><p className="admin-panel-subtitle">Invite trusted teammates. Each person must create a password and confirm their email before they can sign in.</p></div><StatusPill tone={sessionInfo?.accountEmail?.configured ? "mint" : "coral"}>{sessionInfo?.accountEmail?.configured ? "Email ready" : "Email setup needed"}</StatusPill></div>
+                {!sessionInfo?.accountEmail?.configured && <div className="admin-warning-banner mt-5"><AlertCircle size={18} /><span>Invitations require SMTP to send from connect@avenroo.in. {sessionInfo?.accountEmail?.reason || "Check the API mail settings."}</span></div>}
+                <form className="admin-invite-form" onSubmit={handleInvite}>
+                  <label htmlFor="invite-email">Invite by email</label>
+                  <div><input id="invite-email" type="email" autoComplete="email" required value={inviteEmail} onChange={(event) => setInviteEmail(event.target.value)} placeholder="teammate@company.com" /><button className="admin-primary-button" type="submit" disabled={isInviting || !sessionInfo?.accountEmail?.configured}><UserPlus size={16} />{isInviting ? "Sending…" : "Send invitation"}</button></div>
+                  <small>Invitation links expire after 7 days. A new invitation replaces any older unused invitation for the same address.</small>
+                </form>
+              </section>
+              <section className="admin-panel-card">
+                <div className="admin-panel-heading"><div><p className="admin-eyebrow">Admin accounts</p><h2>Administrators</h2></div><StatusPill tone="muted">{teamUsers.length} total</StatusPill></div>
+                {teamUsers.length ? <div className="admin-team-list">{teamUsers.map((user) => <article key={user.id}><span className="admin-team-avatar">{(user.name || "A").slice(0, 1).toUpperCase()}</span><div><strong>{user.name}</strong><small>{user.email}</small></div><StatusPill tone={user.emailVerifiedAt ? "mint" : "coral"}>{user.emailVerifiedAt ? (user.role === "owner" ? "Owner" : "Verified") : "Pending verification"}</StatusPill></article>)}</div> : <EmptyState icon={ShieldCheck} title="No accounts found" copy="The admin account list could not be loaded." />}
+              </section>
+              <section className="admin-panel-card">
+                <div className="admin-panel-heading"><div><p className="admin-eyebrow">Open invitations</p><h2>Awaiting registration</h2></div><StatusPill tone="muted">{teamInvites.length} pending</StatusPill></div>
+                {teamInvites.length ? <div className="admin-team-list">{teamInvites.map((invite) => <article key={invite.id}><span className="admin-team-avatar admin-team-avatar--invite"><Mail size={16} /></span><div><strong>{invite.email}</strong><small>Expires {localDate(invite.expiresAt)}</small></div><StatusPill tone="coral">Waiting</StatusPill></article>)}</div> : <EmptyState icon={Mail} title="No open invitations" copy="Invited teammates will appear here until they register." />}
+              </section>
+            </div>
+          )}
+
           {activeTab === "system" && (
             <>
               <section className="admin-system-banner"><span className={apiIsHealthy ? "is-online" : "is-offline"} /><div><strong>{apiIsHealthy ? "API is responding normally" : "API needs attention"}</strong><p>Last checked {localDate(health?.timestamp)}.</p></div><button className="admin-secondary-button" onClick={loadData}><RefreshCw size={15} /> Check again</button></section>
@@ -605,7 +746,7 @@ export default function AdminPage() {
                 <article className="admin-system-card"><div><span className="admin-pulse-icon"><Server size={18} /></span><StatusPill tone={apiIsHealthy ? "mint" : "coral"}>{health?.status || "Unknown"}</StatusPill></div><h2>API service</h2><p>Application health endpoint and service availability.</p><small>{health?.timestamp ? `Checked ${localDate(health.timestamp)}` : "No health response received"}</small></article>
                 <article className="admin-system-card"><div><span className="admin-pulse-icon"><Database size={18} /></span><StatusPill tone={health?.database === "connected" ? "mint" : "coral"}>{health?.database || "Unknown"}</StatusPill></div><h2>Contact storage</h2><p>Database and contact form storage status.</p><small>{health?.contactStorage || "Storage detail unavailable"}</small></article>
                 <article className="admin-system-card"><div><span className="admin-pulse-icon"><Mail size={18} /></span><StatusPill tone={sessionInfo?.campaignEmail?.configured ? "mint" : "coral"}>{sessionInfo?.campaignEmail?.configured ? "Ready" : "Setup needed"}</StatusPill></div><h2>Bulk email</h2><p>SMTP configuration used to deliver individual campaign messages.</p><small>{sessionInfo?.campaignEmail?.fromEmail || "SMTP sender not configured"}</small></article>
-                <article className="admin-system-card"><div><span className="admin-pulse-icon"><ShieldCheck size={18} /></span><StatusPill tone="mint">Protected</StatusPill></div><h2>Admin access</h2><p>Admin API key is required for all panel data and updates.</p><small>Key is held in this browser session only.</small></article>
+                <article className="admin-system-card"><div><span className="admin-pulse-icon"><ShieldCheck size={18} /></span><StatusPill tone="mint">Protected</StatusPill></div><h2>Admin access</h2><p>Verified email accounts use server-side sessions and invitation-based registration.</p><small>{currentUser?.email || "Session user unavailable"}</small></article>
               </div>
               <section className="admin-note-card"><AlertCircle size={18} /><p><strong>Deployment note</strong> Your sheet is saved in MongoDB when the database is connected. The local-file fallback is for development and may not persist across hosted service restarts.</p></section>
             </>

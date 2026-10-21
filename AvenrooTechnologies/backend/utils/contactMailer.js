@@ -22,6 +22,7 @@ const getRecipients = () =>
     .filter(Boolean);
 
 const getEmailDomain = (email) => String(email || "").split("@")[1] || "";
+const OFFICIAL_ADMIN_EMAIL = "connect@avenroo.in";
 
 const getTransportConfig = () => {
   const host = process.env.SMTP_HOST?.trim();
@@ -57,6 +58,37 @@ export const getOutboundMailerStatus = () => {
   }
   if (!fromEmail) return { configured: false, reason: "SMTP_FROM_EMAIL or SMTP_USER is not configured." };
   return { configured: true, fromEmail };
+};
+
+export const getAdminAuthMailerStatus = () => {
+  const status = getOutboundMailerStatus();
+  const configuredFrom = process.env.SMTP_FROM_EMAIL?.trim().toLowerCase() || process.env.SMTP_USER?.trim().toLowerCase();
+  if (!status.configured) return status;
+  if (configuredFrom !== OFFICIAL_ADMIN_EMAIL) {
+    return { configured: false, reason: `SMTP_FROM_EMAIL must be ${OFFICIAL_ADMIN_EMAIL} to send account confirmation mail.` };
+  }
+  return { configured: true, fromEmail: OFFICIAL_ADMIN_EMAIL };
+};
+
+export const sendAdminAuthEmail = async ({ to, subject, text }) => {
+  const status = getAdminAuthMailerStatus();
+  if (!status.configured) throw new Error(status.reason);
+  const transport = getTransportConfig();
+  const transporter = nodemailer.createTransport(transport);
+  const info = await transporter.sendMail({
+    from: { name: cleanHeaderValue(process.env.SMTP_FROM_NAME || getBrandName()), address: OFFICIAL_ADMIN_EMAIL },
+    to: cleanHeaderValue(to),
+    replyTo: OFFICIAL_ADMIN_EMAIL,
+    subject: cleanHeaderValue(subject),
+    text,
+  });
+  if (!info.accepted?.length) throw new Error("SMTP did not accept the account email recipient.");
+  logger.info("admin_auth_mailer.send.completed", {
+    messageId: info.messageId,
+    acceptedCount: info.accepted?.length || 0,
+    rejectedCount: info.rejected?.length || 0,
+  });
+  return { sent: true, messageId: info.messageId };
 };
 
 export const getContactMailerStatus = () => {

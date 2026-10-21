@@ -9,6 +9,7 @@ import { isDatabaseReady } from "./config/db.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import { apiLimiter } from "./middleware/rateLimiters.js";
 import { ensureDefaultServices } from "./utils/serviceSeed.js";
@@ -71,6 +72,7 @@ app.use("/api", apiLimiter);
 
 app.use(
   cors({
+    credentials: true,
     origin(origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
         logger.debug("cors.origin.allowed", { origin: origin || "same-origin" });
@@ -85,6 +87,8 @@ app.use(
 );
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+app.use("/api/auth", authRoutes);
 
 app.get("/api/health", (req, res) => {
   const databaseReady = isDatabaseReady();
