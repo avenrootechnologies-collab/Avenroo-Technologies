@@ -15,7 +15,7 @@ services:
       - key: LOG_LEVEL
         value: info
       - key: CLIENT_URLS
-        value: https://avenroo-technologies.vercel.app
+        value: https://avenroo-technologies.vercel.app,https://avenroo.in,https://www.avenroo.in
       - key: HEALTH_INCLUDE_DETAILS
         value: "true"
       - key: ALLOW_PRODUCTION_LOCAL_CONTACT_STORAGE

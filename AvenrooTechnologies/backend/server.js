@@ -37,7 +37,13 @@ const allowedOrigins = clientUrlSource
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-if (isProduction && allowedOrigins.length === 0) {
+if (isProduction) {
+  allowedOrigins.push("https://avenroo.in", "https://www.avenroo.in");
+}
+
+const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
+
+if (isProduction && uniqueAllowedOrigins.length === 0) {
   throw new Error("CLIENT_URLS must be configured in production.");
 }
 
@@ -74,7 +80,7 @@ app.use(
   cors({
     credentials: true,
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || uniqueAllowedOrigins.includes(origin)) {
         logger.debug("cors.origin.allowed", { origin: origin || "same-origin" });
         callback(null, true);
         return;
@@ -150,7 +156,7 @@ const startServer = async () => {
       port: PORT,
       nodeEnv: process.env.NODE_ENV || "development",
       logLevel: process.env.LOG_LEVEL || (process.env.NODE_ENV === "production" ? "info" : "debug"),
-      allowedOriginCount: allowedOrigins.length,
+      allowedOriginCount: uniqueAllowedOrigins.length,
     });
   });
 
