@@ -22,7 +22,7 @@ const getRecipients = () =>
     .filter(Boolean);
 
 const getEmailDomain = (email) => String(email || "").split("@")[1] || "";
-const OFFICIAL_ADMIN_EMAIL = "connect@avenroo.in";
+const OFFICIAL_ADMIN_EMAIL = "avenrootechnologies@gmail.com";
 
 const getTransportConfig = () => {
   const host = process.env.SMTP_HOST?.trim();

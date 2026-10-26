@@ -14,7 +14,7 @@ import {
 } from "../utils/adminSecurity.js";
 import { getAdminAuthMailerStatus, sendAdminAuthEmail } from "../utils/contactMailer.js";
 
-const OFFICIAL_ADMIN_EMAIL = "connect@avenroo.in";
+const OFFICIAL_ADMIN_EMAIL = "avenrootechnologies@gmail.com";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const OWNER_VERIFICATION_DURATION_MS = 48 * 60 * 60 * 1000;
 const INVITE_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -255,7 +255,7 @@ export const inviteAdmin = async (req, res) => {
         "",
         `Create your account and confirm your email within 7 days: ${adminUrl("invite", token)}`,
         "",
-        "The confirmation email will be sent from connect@avenroo.in.",
+        `The confirmation email will be sent from ${OFFICIAL_ADMIN_EMAIL}.`,
         "",
         "Avenroo Technologies",
         OFFICIAL_ADMIN_EMAIL,

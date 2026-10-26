@@ -8,6 +8,7 @@ import {
   Clock3,
   Database,
   Download,
+  FileText,
   FileSpreadsheet,
   Inbox,
   LayoutDashboard,
@@ -24,12 +25,14 @@ import {
   UserPlus,
 } from "lucide-react";
 import API from "../api/axios";
+import DocumentStudio from "./DocumentStudio";
 import "./AdminPage.css";
 
 const navItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "sheet", label: "Contact sheet", icon: FileSpreadsheet },
+  { id: "documents", label: "Letter studio", icon: FileText },
   { id: "campaigns", label: "Email campaigns", icon: Mail },
   { id: "services", label: "Services", icon: BriefcaseBusiness },
   { id: "team", label: "Team access", icon: UserPlus },
@@ -173,7 +176,7 @@ function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, load
   const bootstrap = Boolean(authStatus?.bootstrapAvailable);
   const [mode, setMode] = useState(bootstrap || invite ? "register" : "login");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState(invite?.email || (bootstrap ? "connect@avenroo.in" : ""));
+  const [email, setEmail] = useState(invite?.email || (bootstrap ? "avenrootechnologies@gmail.com" : ""));
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [formError, setFormError] = useState("");
@@ -235,7 +238,7 @@ function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, load
         {!invite && <button className="admin-auth-switch mt-5 w-full" type="button" onClick={() => { setMode(isRegistering ? "login" : "register"); setFormError(""); }}>
           {isRegistering ? "Already have an account? Sign in" : bootstrap ? "Set up the owner account" : "Create account or accept an invitation"}
         </button>}
-        {isRegistering && bootstrap && <p className="mt-4 text-center text-xs leading-5 text-slate-400">The first owner account must use connect@avenroo.in.</p>}
+        {isRegistering && bootstrap && <p className="mt-4 text-center text-xs leading-5 text-slate-400">The first owner account must use avenrootechnologies@gmail.com.</p>}
       </form>
     </main>
   );
@@ -677,6 +680,8 @@ export default function AdminPage() {
             </section>
           )}
 
+          {activeTab === "documents" && <DocumentStudio />}
+
           {activeTab === "campaigns" && (
             <div className="admin-campaign-layout">
               <section className="admin-panel-card">
@@ -722,7 +727,7 @@ export default function AdminPage() {
             <div className="admin-team-layout">
               <section className="admin-panel-card">
                 <div className="admin-panel-heading"><div><p className="admin-eyebrow">Account security</p><h2>Team access</h2><p className="admin-panel-subtitle">Invite trusted teammates. Each person must create a password and confirm their email before they can sign in.</p></div><StatusPill tone={sessionInfo?.accountEmail?.configured ? "mint" : "coral"}>{sessionInfo?.accountEmail?.configured ? "Email ready" : "Email setup needed"}</StatusPill></div>
-                {!sessionInfo?.accountEmail?.configured && <div className="admin-warning-banner mt-5"><AlertCircle size={18} /><span>Invitations require SMTP to send from connect@avenroo.in. {sessionInfo?.accountEmail?.reason || "Check the API mail settings."}</span></div>}
+                {!sessionInfo?.accountEmail?.configured && <div className="admin-warning-banner mt-5"><AlertCircle size={18} /><span>Invitations require SMTP to send from avenrootechnologies@gmail.com. {sessionInfo?.accountEmail?.reason || "Check the API mail settings."}</span></div>}
                 <form className="admin-invite-form" onSubmit={handleInvite}>
                   <label htmlFor="invite-email">Invite by email</label>
                   <div><input id="invite-email" type="email" autoComplete="email" required value={inviteEmail} onChange={(event) => setInviteEmail(event.target.value)} placeholder="teammate@company.com" /><button className="admin-primary-button" type="submit" disabled={isInviting || !sessionInfo?.accountEmail?.configured}><UserPlus size={16} />{isInviting ? "Sending…" : "Send invitation"}</button></div>
