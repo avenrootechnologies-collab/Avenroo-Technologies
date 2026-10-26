@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from "react";
 import { AlertCircle, Award, Download, FileSpreadsheet, FileText, Printer, ShieldCheck, Upload, X } from "lucide-react";
-import * as XLSX from "xlsx";
 import "./DocumentStudio.css";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -32,7 +31,7 @@ function formatDate(value) {
   if (!text) return "";
 
   const isoDate = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  const indianDate = text.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})$/);
+  const indianDate = text.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/);
   let date;
   if (isoDate) date = new Date(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3]));
   else if (indianDate) date = new Date(Number(indianDate[3]), Number(indianDate[2]) - 1, Number(indianDate[1]));
@@ -43,7 +42,8 @@ function formatDate(value) {
     : date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
 }
 
-function downloadTemplate() {
+async function downloadTemplate() {
+  const XLSX = await import("xlsx");
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.aoa_to_sheet([
     ["Employee Name", "Designation", "Department", "Joining Date", "Salary", "Location", "Program", "Duration", "Issue Date", "Certificate ID"],
@@ -197,6 +197,7 @@ export default function DocumentStudio() {
     setIsReading(true);
     try {
       if (file.size > MAX_FILE_SIZE) throw new Error("Choose a spreadsheet smaller than 10 MB.");
+      const XLSX = await import("xlsx");
       const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true, sheetRows: MAX_DOCUMENTS + 2 });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       if (!sheet) throw new Error("No worksheet was found in this file.");
