@@ -7,6 +7,7 @@ import "./DocumentStudio.css";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_DOCUMENTS = 200;
+const SIGNATURE_IMAGE_PATH = "/avenroo-signature.png";
 const aliases = {
   name: ["employeename", "name", "fullname"],
   designation: ["designation", "jobtitle", "position", "role", "jobrole"],
@@ -145,8 +146,7 @@ function DocumentPage({ person, type, settings, templatePolicy }) {
               {person.certificateId && <div><span>{fieldLabels?.certificateId?.toUpperCase() || "CERTIFICATE ID"}</span><strong>{person.certificateId}</strong></div>}
             </div>
             <div className="document-signature document-signature--certificate">
-              <span className="signature-rule" />
-              <strong>{settings.signatoryName}</strong>
+              <img className="authorized-signature-image authorized-signature-image--certificate" src={SIGNATURE_IMAGE_PATH} alt="Authorized electronic signature" />
               <small>{settings.signatoryTitle}</small>
             </div>
           </div>
@@ -216,9 +216,8 @@ function DocumentPage({ person, type, settings, templatePolicy }) {
         <div className="offer-signature-grid">
           <div className="offer-signature-panel">
             <span>For {settings.legalEmployerName}</span>
-            <div className="offer-signature-space" />
-            <strong>{settings.signatoryName}</strong>
-            <small>{settings.signatoryTitle}</small>
+            <img className="authorized-signature-image authorized-signature-image--offer" src={SIGNATURE_IMAGE_PATH} alt="Authorized electronic signature" />
+            <strong>{settings.signatoryTitle}</strong>
             <small>Date: __________________</small>
           </div>
           <div className="offer-signature-panel">
@@ -269,8 +268,7 @@ export default function DocumentStudio() {
     defaultDesignation: "",
     defaultEngagementType: "",
     defaultProgram: "",
-    signatoryName: "",
-    signatoryTitle: "",
+    signatoryTitle: "Founder",
     unpaidEngagementConfirmed: false,
   });
   const documents = useMemo(() => people.map((person) => ({ person, key: `${person.sourceRow}-${person.name}` })), [people]);
@@ -401,11 +399,11 @@ export default function DocumentStudio() {
               <label className="document-field">Default job title<input maxLength={100} value={settings.defaultDesignation} onChange={(event) => updateSetting("defaultDesignation", event.target.value)} placeholder="Optional; use the sheet for different roles" /></label>
               <label className="document-field">Default engagement type (optional)<select value={settings.defaultEngagementType} onChange={(event) => updateSetting("defaultEngagementType", event.target.value)}><option value="">Use each row or leave unspecified</option>{templatePolicy?.offer?.engagementTypes.map((option) => <option key={option}>{option}</option>)}</select></label>
             </> : <label className="document-field">Default program name<input maxLength={120} value={settings.defaultProgram} onChange={(event) => updateSetting("defaultProgram", event.target.value)} /></label>}
-            <label className="document-field">Signatory name<input maxLength={100} value={settings.signatoryName} onChange={(event) => updateSetting("signatoryName", event.target.value)} /></label>
             <label className="document-field">Signatory title<input maxLength={100} value={settings.signatoryTitle} onChange={(event) => updateSetting("signatoryTitle", event.target.value)} /></label>
           </div>
+          <div className="document-esignature-preview"><div><strong>Electronic signature</strong><small>Used on generated offers and certificates</small></div><img src={SIGNATURE_IMAGE_PATH} alt="Authorized electronic signature preview" /></div>
 
-          {type === "offer" && <div className="document-authenticity-note"><ShieldCheck size={17} /><span>Offer generation uses the approved server-side template rules. The registered employer, verified office address, real signatory, and each recipient's required terms must be complete. Workbook contents remain in this browser.</span></div>}
+          {type === "offer" && <div className="document-authenticity-note"><ShieldCheck size={17} /><span>Offer generation uses the approved server-side template rules. The registered employer, verified office address, authorized e-signature and signatory title, and each recipient's required terms must be complete. Workbook contents remain in this browser.</span></div>}
           {type === "offer" && hasUnpaidEngagement && <>
             <label className="unpaid-internship-confirmation"><input type="checkbox" checked={settings.unpaidEngagementConfirmed} onChange={(event) => updateSetting("unpaidEngagementConfirmed", event.target.checked)} /><span>{templatePolicy?.offer?.unpaidEngagement?.confirmationLabel}</span></label>
             <p className="unpaid-internship-legal-note"><strong>{templatePolicy?.offer?.unpaidEngagement?.legalReviewHeading}:</strong> {templatePolicy?.offer?.unpaidEngagement?.legalReviewStatement} <a href={templatePolicy?.offer?.unpaidEngagement?.legalReviewUrl} target="_blank" rel="noreferrer">Read the Act</a></p>

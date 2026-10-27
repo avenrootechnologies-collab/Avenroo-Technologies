@@ -136,6 +136,11 @@
 .document-field input:focus, .document-field select:focus { border-color: #28bba7; box-shadow: 0 0 0 3px rgba(40, 187, 167, 0.13); }
 .document-authenticity-note { display: flex; gap: 0.6rem; margin-top: 0.85rem; border: 1px solid #d3e7df; border-radius: 0.75rem; background: #f2faf6; padding: 0.72rem 0.8rem; color: #4d6b62; font-size: 0.67rem; line-height: 1.55; }
 .document-authenticity-note svg { flex: none; margin-top: 0.02rem; color: #168d7d; }
+.document-esignature-preview { display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.2rem; border: 1px solid #dce8e3; border-radius: 0.75rem; background: #fbfdfc; padding: 0.55rem 0.75rem; }
+.document-esignature-preview strong, .document-esignature-preview small { display: block; }
+.document-esignature-preview strong { color: #304a50; font-size: 0.68rem; }
+.document-esignature-preview small { margin-top: 0.18rem; color: #809096; font-size: 0.62rem; }
+.document-esignature-preview img { width: 7rem; height: 3.1rem; object-fit: contain; }
 .unpaid-internship-confirmation { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 0.7rem; border: 1px solid #ebd8ae; border-radius: 0.75rem; background: #fffaf0; padding: 0.72rem 0.8rem; color: #755f36; font-size: 0.67rem; line-height: 1.55; }
 .unpaid-internship-confirmation input { width: 1rem; height: 1rem; flex: none; margin: 0.1rem 0 0; accent-color: #168d7d; }
 .unpaid-internship-legal-note { margin: 0.55rem 0 0; color: #755f36; font-size: 0.66rem; line-height: 1.55; }
@@ -213,6 +218,8 @@
 .offer-signature-panel > span { color: #168d7d; font-size: 6.4pt; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
 .offer-signature-panel > p { min-height: 8mm; margin: 1.5mm 0 0; color: #596e72; font-size: 7pt; line-height: 1.4; }
 .offer-signature-space { height: 9mm; border-bottom: 1px solid #9aadaa; margin: 2mm 0 1.5mm; }
+.authorized-signature-image { display: block; object-fit: contain; object-position: left center; }
+.authorized-signature-image--offer { width: 31mm; height: 13mm; margin: 1mm 0 0.5mm; }
 .offer-signature-panel > strong, .offer-signature-panel > small { display: block; }
 .offer-signature-panel > strong { color: #213f45; font-size: 7.3pt; }
 .offer-signature-panel > small { margin-top: 0.7mm; color: #71858a; font-size: 6.5pt; }
@@ -233,7 +240,9 @@
 .certificate-meta > div { display: grid; gap: 0.3rem; }
 .certificate-meta span { color: #819293; font-size: 0.52rem; font-weight: 900; letter-spacing: 0.16em; }
 .certificate-meta strong { color: #304e52; font-size: 0.73rem; font-weight: 700; }
-.document-signature--certificate { justify-items: center; margin-top: 2.4rem; }
+.document-signature--certificate { display: grid; justify-items: center; gap: 0.15rem; margin-top: 1rem; }
+.authorized-signature-image--certificate { width: 58mm; height: 29mm; object-position: center; }
+.document-signature--certificate small { color: #304e52; font-size: 0.73rem; font-weight: 700; }
 .certificate-footer { border-top: 1px solid #e0ece6; padding-top: 0.7rem; color: #82928f; font-size: 0.56rem; letter-spacing: 0.09em; text-align: center; text-transform: uppercase; }
 
 @media (max-width: 960px) {

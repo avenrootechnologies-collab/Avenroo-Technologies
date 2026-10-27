@@ -45,7 +45,6 @@ export const documentTemplate = {
     requiredSettings: [
       { key: "legalEmployerName", message: "enter the exact registered employer name" },
       { key: "officeAddress", message: "enter the verified registered or principal office address" },
-      { key: "signatoryName", message: "enter the authorized signatory's real name" },
       { key: "signatoryTitle", message: "enter the authorized signatory's title" },
       { key: "contactEmail", message: "enter a valid company contact email", format: "email" },
     ],
@@ -83,7 +82,6 @@ export const documentTemplate = {
   },
   certificate: {
     requiredSettings: [
-      { key: "signatoryName", message: "enter the authorized signatory's real name" },
       { key: "signatoryTitle", message: "enter the authorized signatory's title" },
     ],
     requiredPersonFields: [
