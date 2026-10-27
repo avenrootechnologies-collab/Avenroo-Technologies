@@ -175,7 +175,7 @@ function DocumentPage({ person, type, settings, templatePolicy }) {
     person.program && [labels.program, person.program],
     person.duration && [labels.duration, person.duration],
     person.noticePeriod && [labels.noticePeriod, person.noticePeriod],
-  ].filter(([label, value]) => label && value);
+  ].filter((entry) => Array.isArray(entry) && entry[0] && entry[1]);
 
   return (
     <article className="generated-document generated-document--offer">
