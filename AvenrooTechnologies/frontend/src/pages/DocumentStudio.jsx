@@ -8,25 +8,14 @@ import "./DocumentStudio.css";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_DOCUMENTS = 200;
 const aliases = {
-  name: ["name", "fullname", "employeename", "recipientname", "candidatename", "internname", "studentname"],
-  candidateEmail: ["email", "candidateemail", "emailaddress"],
-  candidateAddress: ["address", "candidateaddress", "mailingaddress"],
+  name: ["employeename", "name", "fullname"],
   designation: ["designation", "jobtitle", "position", "role", "jobrole"],
   department: ["department", "team", "division"],
-  engagementType: ["engagementtype", "employmenttype", "engagement", "appointmenttype"],
-  reportingManager: ["reportingmanager", "manager", "reportsto"],
+  engagementType: ["engagementtype", "employmenttype", "engagement"],
   joiningDate: ["joiningdate", "startdate", "employmentstartdate", "dateofjoining"],
-  engagementEndDate: ["enddate", "engagementenddate", "employmentenddate", "internshipenddate", "termenddate"],
   salary: ["salary", "ctc", "compensation", "annualsalary", "pay"],
-  workArrangement: ["workarrangement", "workmode", "modeofwork"],
   location: ["location", "worklocation", "city", "office"],
-  workingHours: ["workinghours", "workhours", "schedule", "workingdaysandhours"],
-  probation: ["probation", "probationperiod"],
   noticePeriod: ["noticeperiod", "notice"],
-  responsibilities: ["responsibilities", "duties", "rolesummary", "jobsummary"],
-  completionCriteria: ["completioncriteria", "certificatecriteria", "completionrequirements", "criteria"],
-  offerReference: ["offerreference", "offerid", "referencenumber"],
-  offerDeadline: ["offerdeadline", "acceptanceby", "responsedue"],
   program: ["program", "course", "internship", "training", "achievement", "certification"],
   duration: ["duration", "programduration", "internshipduration", "courseperiod"],
   issueDate: ["issuedate", "date", "completiondate", "certificatedate", "dateofissue"],
@@ -37,9 +26,9 @@ const normalizeHeader = (value) => String(value ?? "").toLowerCase().replace(/[^
 const cleanValue = (value) => String(value ?? "").trim();
 const engagementCategory = (value) => {
   if (/unpaid[\s-]*intern/i.test(value)) return "unpaid-internship";
-  if (/paid[\s-]*intern/i.test(value)) return "internship";
-  if (/intern/i.test(value)) return "internship";
-  if (/fixed[\s-]*term/i.test(value)) return "fixed-term";
+  if (/paid[\s-]*intern/i.test(value)) return "paid-internship";
+  if (/unpaid/i.test(value)) return "unpaid";
+  if (/paid/i.test(value)) return "paid";
   if (/part[\s-]*time/i.test(value)) return "part-time";
   if (/full[\s-]*time/i.test(value)) return "full-time";
   return "";
@@ -70,36 +59,25 @@ function formatDate(value) {
 async function downloadTemplate(templatePolicy) {
   const XLSX = await import("xlsx");
   const workbook = XLSX.utils.book_new();
-  const headers = [
-    "Candidate Name", "Candidate Email", "Candidate Address", "Designation", "Department", "Engagement Type",
-    "Reporting Manager", "Joining Date", "End Date (if fixed-term)", "Work Arrangement", "Location", "Working Hours",
-    "Salary / Stipend (amount + period)", "Probation Period", "Notice Period", "Responsibilities", "Completion / Certificate Criteria",
-    "Offer Reference", "Offer Deadline", "Program", "Duration", "Issue Date", "Certificate ID",
-  ];
-  const worksheet = XLSX.utils.aoa_to_sheet([
-    headers,
-  ]);
-  worksheet["!cols"] = [
-    { wch: 24 }, { wch: 30 }, { wch: 34 }, { wch: 28 }, { wch: 20 }, { wch: 24 },
-    { wch: 26 }, { wch: 17 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 24 }, { wch: 32 },
-    { wch: 20 }, { wch: 20 }, { wch: 38 }, { wch: 38 }, { wch: 22 }, { wch: 18 }, { wch: 30 },
-    { wch: 18 }, { wch: 17 }, { wch: 21 },
-  ];
+  const columns = templatePolicy.spreadsheetColumns;
+  const headers = columns.map((column) => column.label);
+  const worksheet = XLSX.utils.aoa_to_sheet([headers]);
+  worksheet["!cols"] = columns.map(({ width }) => ({ wch: width }));
   XLSX.utils.book_append_sheet(workbook, worksheet, "People");
+  const engagementTypes = templatePolicy.offer.engagementTypes.join(", ");
+  const engagementTypeColumn = columns.find(({ key }) => key === "engagementType");
+  const engagementTypeIsOptional = engagementTypeColumn?.optionalFor?.includes("offer") ?? true;
+  const salaryIsOptional = templatePolicy.offer.salaryIsOptional;
   const instructions = XLSX.utils.aoa_to_sheet([
     ["Avenroo Letter Studio - input guide"],
-    ["Enter one real recipient per row on the People sheet. The workbook intentionally contains no sample names, salaries, or signatures."],
-    ["For offer letters, fill Candidate Name, Designation, Engagement Type, Joining Date, pay for paid roles, and at least one of Work Arrangement or Location."],
-    ["Enter the exact registered employer name, verified registered or principal office address, real authorized signatory, and company contact email in Document setup."],
-    ["Use an Engagement Type containing Full-time, Part-time, Fixed-term, Paid internship, or Unpaid internship. Other engagement classifications are not generated by this offer-letter tool."],
-    ["For fixed-term employment or internships, include a duration or end date."],
-    ["For Unpaid internship, leave Salary / Stipend blank. The letter will state that no salary or stipend is offered."],
-    [`For unpaid internships, provide: ${(templatePolicy?.offer?.unpaidInternship?.requiredPersonFields || []).map(({ workbookLabel }) => workbookLabel).join(", ")}.`],
-    [`For unpaid internships, provide at least one of: ${(templatePolicy?.offer?.unpaidInternship?.requiredEitherGroups || []).map(({ workbookLabel }) => workbookLabel).join("; ")}.`],
-    ["Write compensation with amount and period, for example: INR 30,000 per month or INR 4,80,000 per year. Use the actual agreed amount."],
-    ["Probation, notice, and offer reference are optional. The unpaid-internship requirements below override any optional-field guidance."],
-    ["For certificates, fill Candidate Name, Program, Duration (if relevant), Issue Date, and Certificate ID (if used)."],
-    ["The first worksheet is read by the Letter Studio. The spreadsheet is processed in your browser and is not uploaded to the server."],
+    ["Enter one real employee or certificate recipient per row. The People sheet contains only the approved document fields."],
+    [`Engagement Type is ${engagementTypeIsOptional ? "optional" : "required"}. Suggested values: ${engagementTypes}.`],
+    [`Salary is ${salaryIsOptional ? "optional" : "required"}. If the Engagement Type is unpaid, leave Salary blank; unpaid terms will be stated in the letter.`],
+    ["An empty Salary cell does not automatically mean unpaid. Use Engagement Type when you need to state full-time, part-time, paid, or unpaid status."],
+    ["For offer letters, provide Designation, Joining Date, and Location. Salary, Department, Program, Duration, and Notice Period may be left blank when not applicable."],
+    ["For certificates, provide Program. Duration, Issue Date, and Certificate ID are included when supplied."],
+    ["Enter the exact registered employer, verified office address, authorized signatory, and company contact email in Document setup."],
+    ["The workbook is processed in your browser and is not uploaded to the server."],
   ]);
   instructions["!cols"] = [{ wch: 130 }];
   XLSX.utils.book_append_sheet(workbook, instructions, "Instructions");
@@ -113,7 +91,7 @@ function getDocumentRows(table) {
     Object.entries(aliases).map(([field, options]) => [field, headers.findIndex((header) => options.includes(header))]),
   );
   if (columns.name < 0) {
-    throw new Error("Add a Name, Full Name, Employee Name, Candidate Name, or Recipient Name column to the first row.");
+    throw new Error("Add an Employee Name column to the first row.");
   }
 
   const records = table.slice(1).filter((row) => row.some((cell) => cleanValue(cell)));
@@ -142,6 +120,7 @@ function DocumentPage({ person, type, settings, templatePolicy }) {
   const issueDate = formatDate(person.issueDate) || formatDate(settings.issueDate) || "";
   const designation = person.designation || settings.defaultDesignation || "";
   const program = person.program || settings.defaultProgram || "";
+  const fieldLabels = templatePolicy?.offer?.fieldLabels;
 
   if (type === "certificate") {
     return (
@@ -162,8 +141,8 @@ function DocumentPage({ person, type, settings, templatePolicy }) {
               Their dedication, curiosity, and contribution are sincerely appreciated.
             </p>
             <div className="certificate-meta">
-              <div><span>DATE OF ISSUE</span><strong>{issueDate}</strong></div>
-              {person.certificateId && <div><span>CERTIFICATE ID</span><strong>{person.certificateId}</strong></div>}
+              <div><span>{fieldLabels?.issueDate?.toUpperCase() || "DATE OF ISSUE"}</span><strong>{issueDate}</strong></div>
+              {person.certificateId && <div><span>{fieldLabels?.certificateId?.toUpperCase() || "CERTIFICATE ID"}</span><strong>{person.certificateId}</strong></div>}
             </div>
             <div className="document-signature document-signature--certificate">
               <span className="signature-rule" />
@@ -177,28 +156,25 @@ function DocumentPage({ person, type, settings, templatePolicy }) {
     );
   }
 
-  const engagementType = person.engagementType || settings.defaultEngagementType;
+  const engagementType = cleanValue(person.engagementType || settings.defaultEngagementType);
   const engagement = engagementCategory(engagementType);
-  const isInternship = ["internship", "unpaid-internship"].includes(engagement);
+  const isInternship = engagement.endsWith("internship");
+  const isUnpaidEngagement = engagement === "unpaid" || engagement === "unpaid-internship";
   const isUnpaidInternship = engagement === "unpaid-internship";
-  const unpaidTemplate = templatePolicy?.offer?.unpaidInternship;
-  const offerHeading = isUnpaidInternship ? unpaidTemplate?.heading : isInternship ? "Offer of internship" : engagementType ? `Offer of ${engagementType.toLowerCase()}` : "Offer details incomplete";
+  const unpaidTemplate = templatePolicy?.offer?.unpaidEngagement;
+  const labels = fieldLabels || {};
+  const offerHeading = isUnpaidInternship ? unpaidTemplate?.heading : engagementType ? `Offer of ${engagementType.toLowerCase()}` : "Offer letter";
   const terms = [
-    ["Position", designation],
-    person.department && ["Department", person.department],
-    person.reportingManager && [isUnpaidInternship ? unpaidTemplate?.terms?.mentor : "Reporting to", person.reportingManager],
-    ["Engagement", engagementType],
-    ["Joining date", formatDate(person.joiningDate)],
-    person.engagementEndDate && ["End date", formatDate(person.engagementEndDate)],
-    (person.duration || person.engagementEndDate) && [isUnpaidInternship ? unpaidTemplate?.terms?.duration : "Duration", person.duration || `Through ${formatDate(person.engagementEndDate)}`],
-    [(person.workArrangement || person.location) ? (isUnpaidInternship ? unpaidTemplate?.terms?.workArrangement : "Work arrangement / location") : "", [person.workArrangement, person.location].filter(Boolean).join(" · ")],
-    person.workingHours && [isUnpaidInternship ? unpaidTemplate?.terms?.workingSchedule : "Working schedule", person.workingHours],
-    isUnpaidInternship && person.responsibilities && [unpaidTemplate?.terms?.responsibilities, person.responsibilities],
-    person.completionCriteria && [unpaidTemplate?.terms?.completionCriteria || "Completion / certificate criteria", person.completionCriteria],
-    person.offerDeadline && [unpaidTemplate?.terms?.offerDeadline || "Offer acceptance deadline", formatDate(person.offerDeadline)],
-    [isInternship ? (unpaidTemplate?.terms?.salaryLabel || "Stipend / compensation") : "Gross compensation", isUnpaidInternship ? unpaidTemplate?.terms?.salaryValue : person.salary],
-    person.probation && ["Probation", person.probation],
-    person.noticePeriod && ["Notice period", person.noticePeriod],
+    [labels.designation, designation],
+    person.department && [labels.department, person.department],
+    engagementType && [labels.engagementType, engagementType],
+    [labels.joiningDate, formatDate(person.joiningDate)],
+    !isUnpaidEngagement && person.salary && [isInternship ? labels.unpaidSalary : labels.salary, person.salary],
+    isUnpaidEngagement && [isInternship ? labels.unpaidSalary : labels.salary, isInternship ? unpaidTemplate?.internshipSalaryValue : unpaidTemplate?.salaryValue],
+    person.location && [labels.location, person.location],
+    person.program && [labels.program, person.program],
+    person.duration && [labels.duration, person.duration],
+    person.noticePeriod && [labels.noticePeriod, person.noticePeriod],
   ].filter(([label, value]) => label && value);
 
   return (
@@ -218,33 +194,23 @@ function DocumentPage({ person, type, settings, templatePolicy }) {
       <div className="offer-copy">
         <div className="offer-metadata">
           <div><span>ISSUED</span><strong>{issueDate}</strong></div>
-          {person.offerReference && <div><span>REFERENCE</span><strong>{person.offerReference}</strong></div>}
         </div>
         <div className="offer-recipient">
           <span>To</span>
           <strong>{person.name}</strong>
-          {person.candidateEmail && <small>{person.candidateEmail}</small>}
-          {person.candidateAddress && <small>{person.candidateAddress}</small>}
         </div>
         <h2>{offerHeading}</h2>
         <p>Dear {person.name},</p>
         <p>
-          We are pleased to offer you {isInternship ? "an internship as" : "the role of"} <strong>{designation}</strong>{person.department ? <> in the <strong>{person.department}</strong> team</> : null} with <strong>{settings.companyName || "Avenroo Technologies"}</strong>.
-          This is {isUnpaidInternship ? "an unpaid internship" : isInternship ? "a paid internship" : <>a <strong>{engagementType}</strong> engagement</>} with the legal employer or contracting entity <strong>{settings.legalEmployerName}</strong>. The key terms are set out below.
+          We are pleased to offer you {isInternship ? "an internship as" : "the position of"} <strong>{designation}</strong>{person.department ? <> in the <strong>{person.department}</strong> department</> : null} with <strong>{settings.companyName || "Avenroo Technologies"}</strong>. The legal employer or contracting entity is <strong>{settings.legalEmployerName}</strong>.
         </p>
-        {isUnpaidInternship && <p className="offer-unpaid-notice"><strong>{unpaidTemplate?.noStipendHeading}:</strong> {unpaidTemplate?.noStipendStatement} {unpaidTemplate?.reimbursementStatement} {unpaidTemplate?.futureEmploymentStatement}</p>}
+        {isUnpaidEngagement && <p className="offer-unpaid-notice"><strong>{isUnpaidInternship ? unpaidTemplate?.internshipNoStipendHeading : unpaidTemplate?.noStipendHeading}:</strong> {unpaidTemplate?.noStipendStatement} {unpaidTemplate?.reimbursementStatement} {isUnpaidInternship && unpaidTemplate?.futureEmploymentStatement}</p>}
         <h3>Role and engagement details</h3>
         <table className="offer-terms-table"><tbody>{terms.map(([label, value]) => <tr key={label}><th>{label}</th><td>{value}</td></tr>)}</tbody></table>
-        {!isUnpaidInternship && person.responsibilities && <p className="offer-responsibilities"><strong>Role summary:</strong> {person.responsibilities}</p>}
         {isUnpaidInternship && <p className="offer-responsibilities">{unpaidTemplate?.learningStatement}</p>}
         <h3>Offer and acceptance</h3>
         <p>
-          {isUnpaidInternship
-            ? <>{unpaidTemplate?.acceptanceStatement} </>
-            : person.offerDeadline
-              ? <>Please accept this offer by <strong>{formatDate(person.offerDeadline)}</strong> by signing below and returning a copy. </>
-              : "Please review these terms and sign below to record your acceptance. "}
-          This offer is based on the details above and completion of any onboarding checks disclosed to you. {isUnpaidInternship ? "Any change to the duration, schedule, reimbursement, or other terms must be confirmed in writing by the authorized employer representative." : "Applicable deductions, benefits, and service conditions will be set out in the formal documents for this engagement and governed by applicable law."}
+          Please review the terms above and sign below to record your acceptance. This offer is based on the details listed and is governed by applicable law. Any change to these terms must be confirmed in writing by the authorized employer representative.
         </p>
         <p className="offer-contact-line">Questions about this offer? Contact <strong>{settings.contactEmail}</strong>.</p>
         <div className="offer-signature-grid">
@@ -305,10 +271,10 @@ export default function DocumentStudio() {
     defaultProgram: "",
     signatoryName: "",
     signatoryTitle: "",
-    unpaidInternshipConfirmed: false,
+    unpaidEngagementConfirmed: false,
   });
   const documents = useMemo(() => people.map((person) => ({ person, key: `${person.sourceRow}-${person.name}` })), [people]);
-  const hasUnpaidInternship = people.some((person) => engagementCategory(person.engagementType || settings.defaultEngagementType) === "unpaid-internship");
+  const hasUnpaidEngagement = people.some((person) => ["unpaid", "unpaid-internship"].includes(engagementCategory(person.engagementType || settings.defaultEngagementType)));
   const printIssues = useMemo(() => {
     const issues = [];
     if (!templatePolicy) return [templateError || "load the approved document rules from the server"];
@@ -320,25 +286,17 @@ export default function DocumentStudio() {
     if (type === "offer") {
       people.forEach((person) => {
         const missing = [];
-        if (!person.designation && !settings.defaultDesignation) missing.push("role");
-        const engagement = person.engagementType || settings.defaultEngagementType;
+        const engagement = cleanValue(person.engagementType || settings.defaultEngagementType);
         const category = engagementCategory(engagement);
-        if (!category) missing.push("a supported engagement type");
-        if (!person.joiningDate) missing.push("joining date");
+        templatePolicy.offer.requiredPersonFields.forEach(({ key, message }) => {
+          const value = key === "designation" ? (person.designation || settings.defaultDesignation) : person[key];
+          if (!cleanValue(value)) missing.push(message);
+        });
+        if (engagement && !templatePolicy.offer.engagementTypes.some((item) => normalizeHeader(item) === normalizeHeader(engagement))) missing.push("a supported engagement type or leave Engagement Type blank");
         if (!person.issueDate && !settings.issueDate) missing.push("issue date");
-        if (!person.salary && category !== "unpaid-internship") missing.push("compensation or stipend");
-        if (category !== "unpaid-internship" && !person.workArrangement && !person.location) missing.push("work arrangement or location");
-        if (["fixed-term", "internship"].includes(category) && !person.duration && !person.engagementEndDate) missing.push("engagement duration or end date");
-        if (category === "unpaid-internship") {
-          const unpaidTemplate = templatePolicy.offer.unpaidInternship;
-          unpaidTemplate.requiredPersonFields.forEach(({ key, message }) => {
-            const value = key === "designation" ? (person.designation || settings.defaultDesignation) : person[key];
-            if (!cleanValue(value)) missing.push(message);
-          });
-          unpaidTemplate.requiredEitherGroups.forEach(({ keys, message }) => {
-            if (!keys.some((key) => cleanValue(person[key]))) missing.push(message);
-          });
-        }
+        if (category.endsWith("internship")) templatePolicy.offer.internshipRequiredFields.forEach(({ key, message }) => { if (!cleanValue(person[key])) missing.push(message); });
+        if (!templatePolicy.offer.salaryIsOptional && !cleanValue(person.salary) && !["unpaid", "unpaid-internship"].includes(category)) missing.push("salary");
+        if (["unpaid", "unpaid-internship"].includes(category) && cleanValue(person.salary)) missing.push("leave Salary blank for an unpaid engagement");
         if (missing.length) issues.push(`row ${person.sourceRow}: ${missing.join(", ")}`);
       });
     } else {
@@ -350,9 +308,9 @@ export default function DocumentStudio() {
         if (!person.issueDate && !settings.issueDate) issues.push(`row ${person.sourceRow}: issue date`);
       });
     }
-    if (hasUnpaidInternship && !settings.unpaidInternshipConfirmed) issues.push(templatePolicy.offer.unpaidInternship.confirmationIssue);
+    if (hasUnpaidEngagement && !settings.unpaidEngagementConfirmed) issues.push(templatePolicy.offer.unpaidEngagement.confirmationIssue);
     return issues;
-  }, [hasUnpaidInternship, people, settings, templateError, templatePolicy, type]);
+  }, [hasUnpaidEngagement, people, settings, templateError, templatePolicy, type]);
   const canPrint = Boolean(people.length) && printIssues.length === 0;
 
   const updateSetting = (field, value) => setSettings((current) => ({ ...current, [field]: value }));
@@ -372,7 +330,7 @@ export default function DocumentStudio() {
       const table = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false, blankrows: false });
       const result = getDocumentRows(table);
       setPeople(result.people);
-      setSettings((current) => ({ ...current, unpaidInternshipConfirmed: false }));
+      setSettings((current) => ({ ...current, unpaidEngagementConfirmed: false }));
       setSkippedRows(result.skippedRows);
       setFileName(file.name);
     } catch (readError) {
@@ -387,7 +345,7 @@ export default function DocumentStudio() {
 
   const clearWorkbook = () => {
     setPeople([]);
-    setSettings((current) => ({ ...current, unpaidInternshipConfirmed: false }));
+    setSettings((current) => ({ ...current, unpaidEngagementConfirmed: false }));
     setFileName("");
     setSkippedRows(0);
     setError("");
@@ -441,19 +399,19 @@ export default function DocumentStudio() {
             <label className="document-field">Issue date<input type="date" value={settings.issueDate} onChange={(event) => updateSetting("issueDate", event.target.value)} /></label>
             {type === "offer" ? <>
               <label className="document-field">Default job title<input maxLength={100} value={settings.defaultDesignation} onChange={(event) => updateSetting("defaultDesignation", event.target.value)} placeholder="Optional; use the sheet for different roles" /></label>
-              <label className="document-field">Default engagement type<select value={settings.defaultEngagementType} onChange={(event) => updateSetting("defaultEngagementType", event.target.value)}><option value="">Select after confirming</option><option>Full-time employment</option><option>Part-time employment</option><option>Fixed-term employment</option><option>Paid internship</option><option>Unpaid internship</option></select></label>
+              <label className="document-field">Default engagement type (optional)<select value={settings.defaultEngagementType} onChange={(event) => updateSetting("defaultEngagementType", event.target.value)}><option value="">Use each row or leave unspecified</option>{templatePolicy?.offer?.engagementTypes.map((option) => <option key={option}>{option}</option>)}</select></label>
             </> : <label className="document-field">Default program name<input maxLength={120} value={settings.defaultProgram} onChange={(event) => updateSetting("defaultProgram", event.target.value)} /></label>}
             <label className="document-field">Signatory name<input maxLength={100} value={settings.signatoryName} onChange={(event) => updateSetting("signatoryName", event.target.value)} /></label>
             <label className="document-field">Signatory title<input maxLength={100} value={settings.signatoryTitle} onChange={(event) => updateSetting("signatoryTitle", event.target.value)} /></label>
           </div>
 
           {type === "offer" && <div className="document-authenticity-note"><ShieldCheck size={17} /><span>Offer generation uses the approved server-side template rules. The registered employer, verified office address, real signatory, and each recipient's required terms must be complete. Workbook contents remain in this browser.</span></div>}
-          {type === "offer" && hasUnpaidInternship && <>
-            <label className="unpaid-internship-confirmation"><input type="checkbox" checked={settings.unpaidInternshipConfirmed} onChange={(event) => updateSetting("unpaidInternshipConfirmed", event.target.checked)} /><span>{templatePolicy?.offer?.unpaidInternship?.confirmationLabel}</span></label>
-            <p className="unpaid-internship-legal-note"><strong>{templatePolicy?.offer?.unpaidInternship?.legalReviewHeading}:</strong> {templatePolicy?.offer?.unpaidInternship?.legalReviewStatement} <a href={templatePolicy?.offer?.unpaidInternship?.legalReviewUrl} target="_blank" rel="noreferrer">Read the Act</a></p>
+          {type === "offer" && hasUnpaidEngagement && <>
+            <label className="unpaid-internship-confirmation"><input type="checkbox" checked={settings.unpaidEngagementConfirmed} onChange={(event) => updateSetting("unpaidEngagementConfirmed", event.target.checked)} /><span>{templatePolicy?.offer?.unpaidEngagement?.confirmationLabel}</span></label>
+            <p className="unpaid-internship-legal-note"><strong>{templatePolicy?.offer?.unpaidEngagement?.legalReviewHeading}:</strong> {templatePolicy?.offer?.unpaidEngagement?.legalReviewStatement} <a href={templatePolicy?.offer?.unpaidEngagement?.legalReviewUrl} target="_blank" rel="noreferrer">Read the Act</a></p>
             <details className="unpaid-internship-review-checklist">
               <summary>Internal pre-issue checklist</summary>
-              <ul>{templatePolicy?.offer?.unpaidInternship?.reviewChecklist?.map((item) => <li key={item.title}><strong>{item.title}.</strong> {item.text}</li>)}</ul>
+              <ul>{templatePolicy?.offer?.unpaidEngagement?.reviewChecklist?.map((item) => <li key={item.title}><strong>{item.title}.</strong> {item.text}</li>)}</ul>
             </details>
           </>}
 
@@ -469,8 +427,15 @@ export default function DocumentStudio() {
           {people.length ? (
             <>
               <div className="document-preview-summary"><span>{type === "offer" ? <FileText size={18} /> : <Award size={18} />}</span><div><strong>{type === "offer" ? "Offer letters" : "Certificates"}</strong><small>{fileName} · {people.length} page{people.length === 1 ? "" : "s"}</small></div></div>
-              <div className="document-preview-table-wrap"><table className="document-preview-table"><thead><tr><th>Name</th><th>{type === "offer" ? "Position" : "Program"}</th><th>{type === "offer" ? "Joining date" : "Issue date"}</th></tr></thead><tbody>
-                {people.slice(0, 8).map((person) => <tr key={`${person.sourceRow}-${person.name}`}><td>{person.name}</td><td>{type === "offer" ? person.designation || settings.defaultDesignation : person.program || settings.defaultProgram}</td><td>{formatDate(type === "offer" ? person.joiningDate : person.issueDate) || formatDate(settings.issueDate)}</td></tr>)}
+              <div className="document-preview-table-wrap"><table className="document-preview-table"><thead><tr>{(type === "offer" ? ["Employee Name", "Designation", "Department", "Joining Date", "Salary", "Location", "Program", "Duration", "Issue Date", "Notice Period", "Engagement Type"] : ["Employee Name", "Department", "Program", "Duration", "Issue Date", "Certificate ID"]).map((heading) => <th key={heading}>{heading}</th>)}</tr></thead><tbody>
+                {people.slice(0, 8).map((person) => {
+                  const engagement = person.engagementType || settings.defaultEngagementType;
+                  const unpaid = ["unpaid", "unpaid-internship"].includes(engagementCategory(engagement));
+                  const cells = type === "offer"
+                    ? [person.name, person.designation || settings.defaultDesignation, person.department, formatDate(person.joiningDate), unpaid ? "Unpaid" : person.salary, person.location, person.program, person.duration, formatDate(person.issueDate) || formatDate(settings.issueDate), person.noticePeriod, engagement]
+                    : [person.name, person.department, person.program || settings.defaultProgram, person.duration, formatDate(person.issueDate) || formatDate(settings.issueDate), person.certificateId];
+                  return <tr key={`${person.sourceRow}-${person.name}`}>{cells.map((cell, index) => <td key={index}>{cell || "—"}</td>)}</tr>;
+                })}
               </tbody></table></div>
               {people.length > 8 && <p className="document-preview-more">Showing 8 of {people.length}. All rows will be included in the printout.</p>}
             </>
