@@ -132,8 +132,10 @@
 .document-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; margin-top: 1.25rem; }
 .document-field { display: grid; min-width: 0; gap: 0.35rem; color: #52676d; font-size: 0.68rem; font-weight: 800; }
 .document-field--wide { grid-column: 1 / -1; }
-.document-field input { width: 100%; min-height: 2.55rem; border: 1px solid #dce7e3; border-radius: 0.75rem; background: #fbfdfc; padding: 0.62rem 0.72rem; color: #16323a; font: inherit; font-size: 0.75rem; font-weight: 500; outline: none; }
-.document-field input:focus { border-color: #28bba7; box-shadow: 0 0 0 3px rgba(40, 187, 167, 0.13); }
+.document-field input, .document-field select { width: 100%; min-height: 2.55rem; border: 1px solid #dce7e3; border-radius: 0.75rem; background: #fbfdfc; padding: 0.62rem 0.72rem; color: #16323a; font: inherit; font-size: 0.75rem; font-weight: 500; outline: none; }
+.document-field input:focus, .document-field select:focus { border-color: #28bba7; box-shadow: 0 0 0 3px rgba(40, 187, 167, 0.13); }
+.document-authenticity-note { display: flex; gap: 0.6rem; margin-top: 0.85rem; border: 1px solid #d3e7df; border-radius: 0.75rem; background: #f2faf6; padding: 0.72rem 0.8rem; color: #4d6b62; font-size: 0.67rem; line-height: 1.55; }
+.document-authenticity-note svg { flex: none; margin-top: 0.02rem; color: #168d7d; }
 
 .document-studio-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.65rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #edf1ef; }
 .document-print-hint { margin-top: 0.7rem; color: #839196; font-size: 0.66rem; line-height: 1.55; }
@@ -166,21 +168,47 @@
 .document-letterhead strong { color: #19353c; font-family: "Space Grotesk", Arial, sans-serif; font-size: 0.98rem; font-weight: 800; letter-spacing: -0.035em; }
 .document-letterhead small { margin-top: 0.22rem; color: #78918e; font-size: 0.49rem; font-weight: 800; letter-spacing: 0.19em; }
 
-.generated-document--offer { display: flex; flex-direction: column; padding: 19mm 21mm 16mm; }
-.offer-rule { height: 1px; margin-top: 0.95rem; background: linear-gradient(90deg, #1aa88f 0%, #b4d8cc 48%, transparent 100%); }
-.offer-copy { max-width: 151mm; padding-top: 18mm; color: #41575d; font-size: 0.89rem; line-height: 1.95; }
-.offer-copy > p { margin: 0 0 1.05rem; }
-.offer-copy .document-date { margin-bottom: 2.2rem; color: #718589; font-size: 0.79rem; }
-.offer-copy .document-recipient { margin-bottom: 0.1rem; color: #193940; font-size: 1rem; font-weight: 800; }
-.offer-copy .document-address { margin-bottom: 1.8rem; color: #75878b; font-size: 0.77rem; }
-.offer-copy h2 { margin: 0 0 1.4rem; color: #1a3c41; font-family: "Space Grotesk", Arial, sans-serif; font-size: 1.55rem; font-weight: 700; letter-spacing: -0.04em; }
+.generated-document--offer { display: flex; flex-direction: column; padding: 13mm 18mm 11mm; }
+.offer-letterhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 8mm; }
+.offer-brand-block { min-width: 0; }
+.offer-brand-block .avenroo-wordmark { gap: 2.5mm; }
+.offer-brand-block .avenroo-wordmark__symbol { width: 12mm; height: 12mm; }
+.offer-brand-block .avenroo-wordmark__name { font-size: 13pt; }
+.offer-brand-block .avenroo-wordmark__descriptor { font-size: 6pt; }
+.offer-brand-contact { display: grid; gap: 1mm; margin: 2mm 0 0 14.5mm; color: #657a7b; font-size: 7pt; line-height: 1.35; }
+.offer-brand-contact strong { color: #28464a; font-size: 7.4pt; }
+.offer-document-label { display: grid; justify-items: end; gap: 1.2mm; padding-top: 1mm; }
+.offer-document-label span { color: #687c7b; font-size: 6.4pt; font-weight: 800; letter-spacing: 0.12em; }
+.offer-document-label strong { color: #168d7d; font-family: "Space Grotesk", Arial, sans-serif; font-size: 10pt; letter-spacing: 0.08em; }
+.offer-rule { height: 1px; margin-top: 4mm; background: linear-gradient(90deg, #1aa88f 0%, #b4d8cc 60%, transparent 100%); }
+.offer-copy { max-width: none; padding-top: 5mm; color: #42585c; font-size: 8.5pt; line-height: 1.45; }
+.offer-copy > p { margin: 0 0 2.5mm; }
+.offer-metadata { display: flex; justify-content: space-between; gap: 8mm; margin-bottom: 4mm; }
+.offer-metadata > div { display: grid; gap: 1mm; }
+.offer-metadata span { color: #718589; font-size: 6pt; font-weight: 800; letter-spacing: 0.12em; }
+.offer-metadata strong { color: #29464c; font-size: 8pt; }
+.offer-recipient { display: grid; gap: 0.7mm; margin-bottom: 4mm; }
+.offer-recipient > span { color: #718589; font-size: 7pt; }
+.offer-recipient > strong { color: #193940; font-size: 9.5pt; }
+.offer-recipient > small { color: #63777b; font-size: 7pt; }
+.offer-copy h2 { margin: 0 0 2.5mm; color: #1a3c41; font-family: "Space Grotesk", Arial, sans-serif; font-size: 16pt; font-weight: 700; letter-spacing: -0.035em; }
+.offer-copy h3 { margin: 3mm 0 1.5mm; color: #168d7d; font-size: 7.2pt; font-weight: 900; letter-spacing: 0.09em; text-transform: uppercase; }
 .offer-copy strong { color: #29464c; }
-.offer-signoff { padding-top: 0.45rem; }
-.document-signature { display: grid; justify-items: start; margin-top: 2.4rem; }
-.signature-rule { display: block; width: 3rem; height: 2px; margin-bottom: 0.65rem; background: #1ca78f; }
-.document-signature > strong { color: #213f45; font-size: 0.82rem; }
-.document-signature > small { margin-top: 0.16rem; color: #71858a; font-size: 0.7rem; }
-.offer-footer { margin-top: auto; border-top: 1px solid #e7eeea; padding-top: 0.7rem; color: #899799; font-size: 0.59rem; letter-spacing: 0.035em; }
+.offer-terms-table { width: 100%; border-collapse: collapse; margin: 0 0 2.5mm; }
+.offer-terms-table th, .offer-terms-table td { border: 1px solid #dce8e3; padding: 1.35mm 2mm; text-align: left; vertical-align: top; }
+.offer-terms-table th { width: 31%; background: #f3f8f5; color: #536c6a; font-size: 7pt; font-weight: 800; }
+.offer-terms-table td { color: #29464c; font-size: 7.3pt; }
+.offer-copy .offer-responsibilities { margin: 2mm 0; font-size: 7.5pt; }
+.offer-contact-line { color: #657a7b; font-size: 7.3pt; }
+.offer-signature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; margin-top: 3mm; }
+.offer-signature-panel { min-width: 0; border: 1px solid #dce8e3; border-radius: 2mm; padding: 2.5mm 3mm; }
+.offer-signature-panel > span { color: #168d7d; font-size: 6.4pt; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.offer-signature-panel > p { min-height: 8mm; margin: 1.5mm 0 0; color: #596e72; font-size: 7pt; line-height: 1.4; }
+.offer-signature-space { height: 9mm; border-bottom: 1px solid #9aadaa; margin: 2mm 0 1.5mm; }
+.offer-signature-panel > strong, .offer-signature-panel > small { display: block; }
+.offer-signature-panel > strong { color: #213f45; font-size: 7.3pt; }
+.offer-signature-panel > small { margin-top: 0.7mm; color: #71858a; font-size: 6.5pt; }
+.offer-footer { margin-top: auto; border-top: 1px solid #e7eeea; padding-top: 2mm; color: #899799; font-size: 6.4pt; letter-spacing: 0.035em; text-align: center; }
 
 .generated-document--certificate { display: flex; padding: 14mm; }
 .certificate-frame { display: flex; width: 100%; min-height: 269mm; flex-direction: column; border: 1.5px solid #83cdbc; outline: 1px solid #e1f1eb; outline-offset: -5mm; padding: 16mm; }
