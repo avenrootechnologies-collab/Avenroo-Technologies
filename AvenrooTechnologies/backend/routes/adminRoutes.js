@@ -10,6 +10,7 @@ import { requireAdminAccess } from "../middleware/adminAuth.js";
 import { adminApiLimiter } from "../middleware/rateLimiters.js";
 import { getAdminAuthMailerStatus, getContactMailerStatus, getOutboundMailerStatus } from "../utils/contactMailer.js";
 import { isDatabaseReady } from "../config/db.js";
+import { documentTemplate } from "../data/documentTemplate.js";
 
 const router = express.Router();
 router.use(adminApiLimiter, requireAdminAccess);
@@ -22,6 +23,7 @@ router.get("/session", (_req, res) => res.json({
   accountEmail: getAdminAuthMailerStatus(),
   database: isDatabaseReady() ? "connected" : "local-file fallback",
 }));
+router.get("/document-template", (_req, res) => res.json(documentTemplate));
 router.get("/users", getAdminAccountLists);
 router.post("/invites", inviteAdmin);
 router.get("/sheet", getOperationsSheet);
