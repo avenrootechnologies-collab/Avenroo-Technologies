@@ -136,6 +136,8 @@
 .document-field input:focus, .document-field select:focus { border-color: #28bba7; box-shadow: 0 0 0 3px rgba(40, 187, 167, 0.13); }
 .document-authenticity-note { display: flex; gap: 0.6rem; margin-top: 0.85rem; border: 1px solid #d3e7df; border-radius: 0.75rem; background: #f2faf6; padding: 0.72rem 0.8rem; color: #4d6b62; font-size: 0.67rem; line-height: 1.55; }
 .document-authenticity-note svg { flex: none; margin-top: 0.02rem; color: #168d7d; }
+.unpaid-internship-confirmation { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 0.7rem; border: 1px solid #ebd8ae; border-radius: 0.75rem; background: #fffaf0; padding: 0.72rem 0.8rem; color: #755f36; font-size: 0.67rem; line-height: 1.55; }
+.unpaid-internship-confirmation input { width: 1rem; height: 1rem; flex: none; margin: 0.1rem 0 0; accent-color: #168d7d; }
 
 .document-studio-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.65rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #edf1ef; }
 .document-print-hint { margin-top: 0.7rem; color: #839196; font-size: 0.66rem; line-height: 1.55; }
@@ -200,6 +202,7 @@
 .offer-terms-table td { color: #29464c; font-size: 7.3pt; }
 .offer-copy .offer-responsibilities { margin: 2mm 0; font-size: 7.5pt; }
 .offer-contact-line { color: #657a7b; font-size: 7.3pt; }
+.offer-copy .offer-unpaid-notice { margin: 2mm 0; border-left: 2px solid #d3a74d; background: #fffaf0; padding: 2mm 2.5mm; color: #6a5735; font-size: 7.5pt; }
 .offer-signature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; margin-top: 3mm; }
 .offer-signature-panel { min-width: 0; border: 1px solid #dce8e3; border-radius: 2mm; padding: 2.5mm 3mm; }
 .offer-signature-panel > span { color: #168d7d; font-size: 6.4pt; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
