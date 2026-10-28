@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import {
   BrowserRouter as Router,
   Navigate,
@@ -88,6 +89,7 @@ function App() {
           </Routes>
         </Suspense>
         <ScrollToTopButton />
+        <Analytics />
       </Router>
     </ThemeProvider>
   );
