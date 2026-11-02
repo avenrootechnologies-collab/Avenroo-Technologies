@@ -44,7 +44,7 @@ const footerLinks = [
   { label: "Home", to: "/clients" },
   { label: "Portfolio", to: "/portfolio" },
   { label: "Services", to: "/services" },
-  { label: "Contact", to: "/#student-connect" },
+  { label: "Contact", to: "/contact" },
 ];
 
 const footerServices = [
@@ -96,7 +96,11 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { pathname } = useLocation();
   const isStudentView = pathname === "/" || pathname === "/students";
-  const links = footerLinks.map((link) => link.label === "Home" ? { ...link, to: isStudentView ? "/" : "/clients" } : link);
+  const links = footerLinks.map((link) => {
+    if (link.label === "Home") return { ...link, to: isStudentView ? "/" : "/clients" };
+    if (link.label === "Contact" && isStudentView) return { ...link, to: "/#student-connect" };
+    return link;
+  });
 
   return (
     <footer className="site-footer">
@@ -199,7 +203,7 @@ export default function Footer() {
                   })
                 ) : (
                   <Link
-                    to="/#student-connect"
+                    to={isStudentView ? "/#student-connect" : "/contact"}
                     className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
                   >
                     Contact us

@@ -8,6 +8,7 @@ import connectDB from "./config/db.js";
 import { isDatabaseReady } from "./config/db.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
+import portfolioRoutes from "./routes/portfolioRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
@@ -129,13 +130,14 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/contact", contactRoutes);
 app.use("/api/services", serviceRoutes);
+app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.get("/api", (req, res) => {
   res.json({
     name: appName,
     status: "running",
-    endpoints: ["/api/health", "/api/contact", "/api/services", "/api/admin"],
+    endpoints: ["/api/health", "/api/contact", "/api/services", "/api/portfolio", "/api/admin"],
   });
 });
 
@@ -143,7 +145,7 @@ app.get("/", (req, res) => {
   res.json({
     name: appName,
     status: "running",
-    endpoints: ["/api/health", "/api/contact", "/api/services", "/api/admin"],
+    endpoints: ["/api/health", "/api/contact", "/api/services", "/api/portfolio", "/api/admin"],
   });
 });
 

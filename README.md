@@ -2,7 +2,9 @@
 
 React/Vite frontend and Express API for Avenroo Technologies. Contact and student enquiry forms submit to the Express API, which stores submissions in MongoDB and sends email notifications when SMTP is configured.
 
-The private operations panel is available at `/admin`. It supports verified email/password accounts, invitation-based team registration, enquiry status tracking, service listing controls, an editable contact sheet with Excel-compatible CSV import/export, offer letter and certificate generation from Excel uploads, email campaigns for opted-in contacts, and API/mail status.
+The private operations panel is available at `/admin`. It supports verified email/password accounts, invitation-based team registration, enquiry status tracking, service listing controls, portfolio and client-review management, an editable contact sheet with Excel-compatible CSV import/export, offer letter and certificate generation from Excel uploads, email campaigns for opted-in contacts, and API/mail status.
+
+The public portfolio reads its content from `GET /api/portfolio`. Administrators can edit the saved content from the Portfolio section in `/admin`; the protected `GET /api/admin/portfolio` and `PUT /api/admin/portfolio` endpoints use the verified admin session and store one portfolio document in MongoDB. Projects can be ordered, published, or archived; client reviews remain private drafts until marked approved and published.
 
 ## Project layout
 

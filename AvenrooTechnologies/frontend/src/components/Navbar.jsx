@@ -35,10 +35,10 @@ const pageNavigation = {
 function getNavItems(pathname) {
   if (pathname === "/portfolio") {
     return [
-      { label: "Selected work", type: "anchor", href: "#work" },
-      { label: "Approach", type: "anchor", href: "#approach" },
-      { label: "Testimonials", type: "anchor", href: "#testimonials" },
-      { label: "Enquire / Apply", type: "route", to: "/#student-connect" },
+      { label: "Work", type: "anchor", href: "#work" },
+      { label: "Reviews", type: "anchor", href: "#client-feedback" },
+      { label: "Our direction", type: "anchor", href: "#direction" },
+      { label: "Capabilities", type: "anchor", href: "#capabilities" },
     ];
   }
 
@@ -91,7 +91,7 @@ function NavbarContent({ onStudentEnquiry, pathname }) {
     ? null
     : pathname === "/contact"
       ? { label: "Review services", to: "/services" }
-      : { label: "Start a project", to: "/#student-connect" };
+      : { label: "Start a project", to: "/contact" };
 
   const themeLabel = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
   const ThemeIcon = theme === "dark" ? SunMedium : MoonStar;
@@ -184,7 +184,7 @@ function NavbarContent({ onStudentEnquiry, pathname }) {
     <header className="site-header sticky top-0 z-40">
       <div className="nav-shell mx-auto max-w-7xl rounded-[26px] px-4 py-3 sm:px-5">
         <div className="flex items-center gap-3">
-          <Link to="/" className="nav-brand shrink-0" aria-label="Avenroo Technologies student home">
+          <Link to={isStudentView ? "/" : "/clients"} className="nav-brand shrink-0" aria-label={isStudentView ? "Avenroo Technologies student home" : "Avenroo Technologies business home"}>
             <BrandLogo />
           </Link>
 

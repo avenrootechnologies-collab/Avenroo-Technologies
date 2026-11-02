@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import API from "../api/axios";
 import DocumentStudio from "./DocumentStudio";
+import PortfolioManager from "./PortfolioManager";
 import "./AdminPage.css";
 
 const navItems = [
@@ -35,6 +36,7 @@ const navItems = [
   { id: "documents", label: "Letter studio", icon: FileText },
   { id: "campaigns", label: "Email campaigns", icon: Mail },
   { id: "services", label: "Services", icon: BriefcaseBusiness },
+  { id: "portfolio", label: "Portfolio", icon: BriefcaseBusiness },
   { id: "team", label: "Team access", icon: UserPlus },
   { id: "system", label: "System status", icon: Activity },
 ];
@@ -722,6 +724,8 @@ export default function AdminPage() {
               {services.length ? <div className="admin-services-list">{services.map((service) => <article className="admin-service-card" key={service._id}><div className="admin-service-title"><span className="admin-service-icon"><BriefcaseBusiness size={18} /></span><div><strong>{service.title}</strong><small>{service.slug}</small></div><StatusPill tone={service.isActive === false ? "muted" : "mint"}>{service.isActive === false ? "Archived" : "Live"}</StatusPill></div><div className="admin-service-fields"><label>Title<input value={serviceDrafts[service._id]?.title || ""} onChange={(event) => updateServiceDraft(service._id, "title", event.target.value)} /></label><label>Price label<input value={serviceDrafts[service._id]?.startingPriceLabel || ""} onChange={(event) => updateServiceDraft(service._id, "startingPriceLabel", event.target.value)} placeholder="e.g. Starting from ₹…" /></label><label className="admin-service-description">Description<textarea rows="3" value={serviceDrafts[service._id]?.description || ""} onChange={(event) => updateServiceDraft(service._id, "description", event.target.value)} /></label></div><div className="admin-service-actions"><button className="admin-secondary-button" onClick={() => toggleService(service)}>{service.isActive === false ? "Publish listing" : "Archive listing"}</button><button className="admin-primary-button" onClick={() => saveService(service)} disabled={savingServiceId === service._id}><Save size={16} /> {savingServiceId === service._id ? "Saving…" : "Save details"}</button></div></article>)}</div> : <EmptyState icon={BriefcaseBusiness} title="No services available" copy="The service catalogue could not be loaded." />}
             </section>
           )}
+
+          {activeTab === "portfolio" && <PortfolioManager announce={announce} />}
 
           {activeTab === "team" && (
             <div className="admin-team-layout">

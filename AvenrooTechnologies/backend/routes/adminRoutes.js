@@ -6,6 +6,7 @@ import {
   sendCampaign,
 } from "../controllers/adminController.js";
 import { getAdminAccountLists, inviteAdmin } from "../controllers/authController.js";
+import { getAdminPortfolio, saveAdminPortfolio } from "../controllers/portfolioController.js";
 import { requireAdminAccess } from "../middleware/adminAuth.js";
 import { adminApiLimiter } from "../middleware/rateLimiters.js";
 import { getAdminAuthMailerStatus, getContactMailerStatus, getOutboundMailerStatus } from "../utils/contactMailer.js";
@@ -30,5 +31,7 @@ router.get("/sheet", getOperationsSheet);
 router.put("/sheet", saveOperationsSheet);
 router.get("/campaigns", getCampaignHistory);
 router.post("/campaigns", sendCampaign);
+router.get("/portfolio", getAdminPortfolio);
+router.put("/portfolio", saveAdminPortfolio);
 
 export default router;

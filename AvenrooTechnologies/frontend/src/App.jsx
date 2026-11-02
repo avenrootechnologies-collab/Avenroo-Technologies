@@ -13,6 +13,7 @@ import StudentLearningLoader from "./components/StudentLearningLoader";
 import { ThemeProvider } from "./components/ThemeProvider";
 
 const Home = lazy(() => import("./components/Home"));
+const ContactPage = lazy(() => import("./pages/Contact"));
 const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const StudentsPage = lazy(() => import("./pages/StudentsPage"));
 const PortfolioPage = lazy(() => import("./pages/PortfolioPage"));
@@ -82,7 +83,7 @@ function App() {
             <Route path="/clients" element={<Home />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/students" element={<Navigate to="/" replace />} />
-            <Route path="/contact" element={<Navigate to="/#student-connect" replace />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/portfolio" element={<PortfolioPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
