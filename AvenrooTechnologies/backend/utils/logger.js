@@ -10,6 +10,15 @@ const LEVELS = {
 const SENSITIVE_KEY_PATTERN =
   /(authorization|cookie|password|pass|secret|token|api[_-]?key|admin[_-]?api[_-]?key|smtp[_-]?user|smtp[_-]?pass|mongo[_-]?uri|database[_-]?url)/i;
 
+const redactSensitiveText = (value) =>
+  String(value)
+    .replace(/\bmongodb(?:\+srv)?:\/\/[^\s"'<>]+/gi, "[redacted-mongodb-uri]")
+    .replace(/\b(Bearer|Basic)\s+[A-Za-z0-9._~+/-]+=*/gi, "$1 [redacted]")
+    .replace(
+      /\b(authorization|cookie|password|pass|secret|token|api[_-]?key|admin[_-]?api[_-]?key|smtp[_-]?(?:user|pass)|mongo(?:db)?[_-]?uri|database[_-]?url)\s*[:=]\s*("[^"]*"|'[^']*'|[^\s,;]+)/gi,
+      "$1=[redacted]",
+    );
+
 const resolveLogLevel = () => {
   const configuredLevel = String(process.env.LOG_LEVEL || "").toLowerCase();
 
@@ -28,12 +37,21 @@ const humanizeMessage = (message) =>
     .map((part) => part.replace(/_/g, " "))
     .join(" > ");
 
+const safeRequestPath = (req) => {
+  try {
+    const pathname = new URL(req.originalUrl || req.url, "http://localhost").pathname;
+    return pathname.replace(/(\/api\/auth\/invites\/)[^/]+/i, "$1[redacted]");
+  } catch {
+    return "/[invalid-path]";
+  }
+};
+
 const sanitizeValue = (value, depth = 0) => {
   if (value instanceof Error) {
     return {
       name: value.name,
-      message: value.message,
-      ...(process.env.NODE_ENV !== "production" ? { stack: value.stack } : {}),
+      message: redactSensitiveText(value.message),
+      ...(process.env.NODE_ENV !== "production" ? { stack: redactSensitiveText(value.stack || "") } : {}),
     };
   }
 
@@ -73,7 +91,7 @@ const formatValue = (value) => {
   }
 
   if (typeof value === "string") {
-    return value.includes(" ") ? `"${value}"` : value;
+    return /[\s"\\]/.test(value) ? JSON.stringify(value) : value;
   }
 
   if (typeof value === "number" || typeof value === "boolean") {
@@ -81,7 +99,7 @@ const formatValue = (value) => {
   }
 
   if (typeof value === "object" && value.name && value.message) {
-    return `"${value.name}: ${value.message}"`;
+    return JSON.stringify(`${value.name}: ${value.message}`);
   }
 
   return JSON.stringify(value);
@@ -135,7 +153,7 @@ export const logger = {
 export const requestContext = (req, meta = {}) => ({
   requestId: req.requestId,
   method: req.method,
-  path: req.originalUrl || req.url,
+  path: safeRequestPath(req),
   ...meta,
 });
 
@@ -145,7 +163,7 @@ export const logRequestStep = (req, level, message, meta = {}) => {
 
 export const requestLogger = (req, res, next) => {
   const startedAt = Date.now();
-  const requestId = req.get("x-request-id") || randomUUID();
+  const requestId = randomUUID();
 
   req.requestId = requestId;
   res.setHeader("X-Request-ID", requestId);
@@ -153,7 +171,7 @@ export const requestLogger = (req, res, next) => {
   logger.debug("http.request.started", {
     requestId,
     method: req.method,
-    path: req.originalUrl || req.url,
+    path: safeRequestPath(req),
     origin: req.get("origin") || null,
     userAgent: req.get("user-agent") || null,
     contentLength: req.get("content-length") || null,
@@ -166,7 +184,7 @@ export const requestLogger = (req, res, next) => {
     logger[level]("http.request.completed", {
       requestId,
       method: req.method,
-      path: req.originalUrl || req.url,
+      path: safeRequestPath(req),
       statusCode: res.statusCode,
       durationMs,
     });
@@ -177,7 +195,7 @@ export const requestLogger = (req, res, next) => {
       logger.warn("http.request.closed_before_response", {
         requestId,
         method: req.method,
-        path: req.originalUrl || req.url,
+        path: safeRequestPath(req),
         durationMs: Date.now() - startedAt,
       });
     }

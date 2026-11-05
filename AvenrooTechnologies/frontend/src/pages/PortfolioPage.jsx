@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowDown,
@@ -27,6 +27,10 @@ import "./PortfolioPage.css";
 
 const iconMap = { Code2, Layers3, ShoppingBag, UsersRound, Workflow, BriefcaseBusiness };
 const iconFor = (name) => iconMap[name] || BriefcaseBusiness;
+
+function PortfolioIcon({ name, size }) {
+  return createElement(iconFor(name), { size, "aria-hidden": true });
+}
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -79,7 +83,8 @@ function CarouselControls({ activeIndex, count, onSelect, label, isPlaying, onTo
 function HeroPrincipleCarousel({ slides, principles }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(() => !prefersReducedMotion());
-  const slide = slides[activeIndex] || slides[0];
+  const selectedIndex = slides.length ? activeIndex % slides.length : 0;
+  const slide = slides[selectedIndex] || slides[0];
 
   useEffect(() => {
     if (!isPlaying || slides.length < 2) return undefined;
@@ -89,15 +94,11 @@ function HeroPrincipleCarousel({ slides, principles }) {
     return () => window.clearInterval(interval);
   }, [isPlaying, slides.length]);
 
-  useEffect(() => {
-    setActiveIndex((current) => (slides.length ? current % slides.length : 0));
-  }, [slides.length]);
-
   if (!slide) return null;
 
   return (
     <div className="portfolio-hero-art" role="region" aria-roledescription="carousel" aria-label="Avenroo principles">
-      <div className="portfolio-hero-art__topline"><span>OUR APPROACH</span><span>{String(activeIndex + 1).padStart(2, "0")} — {String(slides.length).padStart(2, "0")}</span></div>
+      <div className="portfolio-hero-art__topline"><span>OUR APPROACH</span><span>{String(selectedIndex + 1).padStart(2, "0")} — {String(slides.length).padStart(2, "0")}</span></div>
       <div key={slide.id || activeIndex} className="portfolio-hero-art__slide" aria-live={isPlaying ? "off" : "polite"}>
         <p className="portfolio-hero-art__statement">{slide.first}<br />{slide.second} <em>{slide.emphasis}</em></p>
         <p className="portfolio-hero-art__caption">{slide.caption}</p>
@@ -106,7 +107,7 @@ function HeroPrincipleCarousel({ slides, principles }) {
         <div className="portfolio-hero-art__principles">
           {principles.map((principle, index) => <span key={`${principle}-${index}`}><Check size={15} /> {principle}</span>)}
         </div>
-        <CarouselControls activeIndex={activeIndex} count={slides.length} onSelect={setActiveIndex} label="Principle" isPlaying={isPlaying} onTogglePlay={() => setIsPlaying((playing) => !playing)} />
+        <CarouselControls activeIndex={selectedIndex} count={slides.length} onSelect={setActiveIndex} label="Principle" isPlaying={isPlaying} onTogglePlay={() => setIsPlaying((playing) => !playing)} />
       </div>
       <div className="portfolio-hero-art__mark" aria-hidden="true">A<span>.</span></div>
     </div>
@@ -122,7 +123,8 @@ function ProjectReviewsCarousel({ projects, section }) {
       ? published.map((review) => ({ ...review, project }))
       : [{ project, quote: "", attribution: section.pendingLabel, role: "" }];
   });
-  const review = slides[activeIndex] || slides[0];
+  const selectedIndex = slides.length ? activeIndex % slides.length : 0;
+  const review = slides[selectedIndex] || slides[0];
 
   useEffect(() => {
     if (!isPlaying || slides.length < 2) return undefined;
@@ -131,10 +133,6 @@ function ProjectReviewsCarousel({ projects, section }) {
     }, 6000);
     return () => window.clearInterval(interval);
   }, [isPlaying, slides.length]);
-
-  useEffect(() => {
-    setActiveIndex((current) => (slides.length ? current % slides.length : 0));
-  }, [slides.length]);
 
   if (!review) return null;
 
@@ -163,7 +161,7 @@ function ProjectReviewsCarousel({ projects, section }) {
               <strong>{review.attribution || section.pendingLabel}</strong>
               {review.role && <span>{review.role}</span>}
             </div>
-            <CarouselControls activeIndex={activeIndex} count={slides.length} onSelect={setActiveIndex} label="Project review" isPlaying={isPlaying} onTogglePlay={() => setIsPlaying((playing) => !playing)} />
+            <CarouselControls activeIndex={selectedIndex} count={slides.length} onSelect={setActiveIndex} label="Project review" isPlaying={isPlaying} onTogglePlay={() => setIsPlaying((playing) => !playing)} />
           </div>
         </div>
       </div>
@@ -172,15 +170,13 @@ function ProjectReviewsCarousel({ projects, section }) {
 }
 
 function ProjectPreview({ project }) {
-  const Icon = iconFor(project.icon);
-
   return (
     <div className={`portfolio-preview portfolio-preview--${project.visual}`} aria-hidden="true">
       <div className="portfolio-preview-window">
         <div className="portfolio-preview-bar">
           <span className="portfolio-preview-dots"><i /><i /><i /></span>
           <span className="portfolio-preview-url">{project.name.toLowerCase().replaceAll(" ", "-")}.in</span>
-          <Icon size={15} />
+          <PortfolioIcon name={project.icon} size={15} />
         </div>
         <div className="portfolio-preview-content">
           <span className="portfolio-preview-kicker">{project.previewKicker}</span>
@@ -357,10 +353,9 @@ export default function PortfolioPage() {
             </div>
             <div className="portfolio-capability-grid">
               {content.capabilities.map((item) => {
-                const Icon = iconFor(item.icon);
                 return (
                   <article className="portfolio-capability" key={item.id || item.number}>
-                    <div className="portfolio-capability-top"><span>{item.number}</span><Icon size={20} /></div>
+                    <div className="portfolio-capability-top"><span>{item.number}</span><PortfolioIcon name={item.icon} size={20} /></div>
                     <h3>{item.title}</h3>
                     <p>{item.description}</p>
                   </article>

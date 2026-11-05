@@ -6,11 +6,12 @@ import {
 } from "../controllers/contactController.js";
 import { requireAdminAccess } from "../middleware/adminAuth.js";
 import { adminApiLimiter, contactSubmissionLimiter } from "../middleware/rateLimiters.js";
+import { requireTrustedOrigin } from "../middleware/requireTrustedOrigin.js";
 
 const router = express.Router();
 
 router.post("/", contactSubmissionLimiter, createContact);
 router.get("/", adminApiLimiter, requireAdminAccess, getContacts);
-router.patch("/:id/status", adminApiLimiter, requireAdminAccess, updateContactStatus);
+router.patch("/:id/status", requireTrustedOrigin, adminApiLimiter, requireAdminAccess, updateContactStatus);
 
 export default router;

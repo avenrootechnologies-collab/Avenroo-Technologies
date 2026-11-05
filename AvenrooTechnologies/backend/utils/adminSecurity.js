@@ -26,7 +26,7 @@ export const verifyPassword = async (password, encoded) => {
 
 export const createOpaqueToken = () => crypto.randomBytes(32).toString("base64url");
 export const hashOpaqueToken = (token) => crypto.createHash("sha256").update(String(token)).digest("hex");
-export const ADMIN_SESSION_COOKIE = "avenroo_admin_session";
+export const ADMIN_SESSION_COOKIE = process.env.NODE_ENV === "production" ? "__Host-avenroo_admin_session" : "avenroo_admin_session";
 export const ADMIN_SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
 
 export const readAdminSessionCookie = (req) => {

@@ -18,6 +18,7 @@ const OFFICIAL_ADMIN_EMAIL = "avenrootechnologies@gmail.com";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const OWNER_VERIFICATION_DURATION_MS = 48 * 60 * 60 * 1000;
 const INVITE_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+const OPAQUE_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
 const normalizeEmail = (value) => String(value || "").trim().toLowerCase();
 const adminUrl = (queryName, token) => {
@@ -29,8 +30,7 @@ const adminUrl = (queryName, token) => {
   }
   url.pathname = "/admin";
   url.search = "";
-  url.hash = "";
-  url.searchParams.set(queryName, token);
+  url.hash = new URLSearchParams({ [queryName]: token }).toString();
   return url.toString();
 };
 
@@ -41,8 +41,8 @@ const databaseRequired = (res) => {
 };
 
 const validatePassword = (password) => {
-  if (typeof password !== "string" || password.length < 1 || password.length > 128 || Buffer.byteLength(password, "utf8") > 1024) {
-    return "Use a password between 1 and 128 characters.";
+  if (typeof password !== "string" || password.length < 12 || password.length > 128 || Buffer.byteLength(password, "utf8") > 1024) {
+    return "Use a password between 12 and 128 characters.";
   }
   return "";
 };
@@ -54,12 +54,14 @@ export const getAuthStatus = async (_req, res) => {
     Promise.resolve(getAdminAuthMailerStatus()),
   ]);
   res.set("Cache-Control", "no-store");
-  res.json({ bootstrapAvailable: !owner, verificationEmail: mailer });
+  res.json({ bootstrapAvailable: !owner, verificationEmail: { configured: mailer.configured } });
 };
 
 export const inspectInvite = async (req, res) => {
   if (databaseRequired(res)) return;
-  const tokenHash = hashOpaqueToken(req.params.token || "");
+  const token = typeof req.body?.token === "string" ? req.body.token : "";
+  if (!OPAQUE_TOKEN_PATTERN.test(token)) return res.status(404).json({ message: "This invitation is invalid or has expired." });
+  const tokenHash = hashOpaqueToken(token);
   const invite = await AdminInvite.findOne({ tokenHash, usedAt: null, expiresAt: { $gt: new Date() } }).lean();
   if (!invite || await AdminUser.exists({ email: invite.email })) {
     return res.status(404).json({ message: "This invitation is invalid or has expired." });
@@ -79,12 +81,12 @@ export const registerAdmin = async (req, res) => {
   if (!name || name.length > 100) return res.status(400).json({ message: "Enter your name (up to 100 characters)." });
   if (!EMAIL_PATTERN.test(email) || email.length > 254) return res.status(400).json({ message: "Enter a valid email address." });
   if (passwordError) return res.status(400).json({ message: passwordError });
+  if (inviteToken && !OPAQUE_TOKEN_PATTERN.test(inviteToken)) return res.status(400).json({ message: "This invitation is invalid or has expired." });
 
   const mailerStatus = getAdminAuthMailerStatus();
-  if (!mailerStatus.configured) return res.status(503).json({ message: `Email confirmation is not configured: ${mailerStatus.reason}` });
+  if (!mailerStatus.configured) return res.status(503).json({ message: "Email confirmation is temporarily unavailable. Please try again later." });
 
   const existingUser = await AdminUser.findOne({ email });
-  if (existingUser?.emailVerifiedAt) return res.status(409).json({ message: "An account already exists for this email. Sign in instead." });
 
   let role = "admin";
   let claimedInvite = null;
@@ -104,7 +106,7 @@ export const registerAdmin = async (req, res) => {
     if (!claimedInvite) return res.status(400).json({ message: "This invitation has already been used." });
   } else {
     const verifiedOwner = await AdminUser.exists({ role: "owner", emailVerifiedAt: { $ne: null }, isActive: true });
-    if (verifiedOwner || email !== OFFICIAL_ADMIN_EMAIL) {
+    if (verifiedOwner || email !== OFFICIAL_ADMIN_EMAIL || existingUser?.emailVerifiedAt) {
       return res.status(403).json({ message: "New admin accounts require an invitation from an existing administrator." });
     }
     role = "owner";
@@ -165,7 +167,7 @@ export const registerAdmin = async (req, res) => {
 export const verifyAdminEmail = async (req, res) => {
   if (databaseRequired(res)) return;
   const token = String(req.body?.token || "");
-  if (!token) return res.status(400).json({ message: "The confirmation link is missing its token." });
+  if (!OPAQUE_TOKEN_PATTERN.test(token)) return res.status(400).json({ message: "This confirmation link is invalid or has expired." });
   const verification = await AdminVerification.findOne({
     tokenHash: hashOpaqueToken(token),
     expiresAt: { $gt: new Date() },
@@ -187,11 +189,17 @@ export const loginAdmin = async (req, res) => {
   if (databaseRequired(res)) return;
   const email = normalizeEmail(req.body?.email);
   const password = typeof req.body?.password === "string" ? req.body.password : "";
-  const user = await AdminUser.findOne({ email }).select("+passwordHash");
-  if (!user || !user.isActive || !(await verifyPassword(password, user.passwordHash))) {
+  if (email.length > 254 || password.length > 128 || Buffer.byteLength(password, "utf8") > 1024) {
     return res.status(401).json({ message: "Email or password is incorrect." });
   }
-  if (!user.emailVerifiedAt) return res.status(403).json({ message: "Confirm your email using the link we sent before signing in." });
+  const user = await AdminUser.findOne({ email }).select("+passwordHash");
+  const passwordMatches = user
+    ? await verifyPassword(password, user.passwordHash)
+    : (await hashPassword(password), false);
+  if (!user || !user.isActive || !passwordMatches) {
+    return res.status(401).json({ message: "Email or password is incorrect." });
+  }
+  if (!user.emailVerifiedAt) return res.status(401).json({ message: "Email or password is incorrect." });
 
   const token = createOpaqueToken();
   const expiresAt = new Date(Date.now() + ADMIN_SESSION_DURATION_MS);

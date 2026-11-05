@@ -3,6 +3,8 @@ import { isDatabaseReady } from "../config/db.js";
 import { clearAdminSessionCookie, hashOpaqueToken, readAdminSessionCookie } from "../utils/adminSecurity.js";
 
 export const requireAdminAccess = async (req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  res.set("Pragma", "no-cache");
   if (!isDatabaseReady()) {
     return res.status(503).json({ message: "Admin account storage is unavailable. Please try again shortly." });
   }

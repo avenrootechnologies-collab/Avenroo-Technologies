@@ -10,7 +10,18 @@ const asArray = (value, maxItems) => (Array.isArray(value) ? value.slice(0, maxI
 const makeId = (value) => cleanText(value, 80).replace(/[^a-zA-Z0-9_-]/g, "-") || randomUUID();
 const safeHref = (value) => {
   const href = cleanText(value, 500);
-  return href.startsWith("/") && !href.startsWith("//") || /^https:\/\//i.test(href) ? href : "";
+  if (!href || href.includes("\\")) return "";
+
+  try {
+    const parsed = new URL(href, "https://avenroo.invalid");
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password) return "";
+    if (href.startsWith("/") && !href.startsWith("//") && parsed.origin === "https://avenroo.invalid") {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+    return /^https:\/\//i.test(href) ? parsed.href : "";
+  } catch {
+    return "";
+  }
 };
 
 const iconNames = new Set(["Code2", "UsersRound", "ShoppingBag", "Layers3", "Workflow", "BriefcaseBusiness"]);
@@ -168,10 +179,12 @@ const portfolioResponse = (record, { publicView = false } = {}) => {
       }
     : content;
 
+  if (publicView) return { content: visibleContent };
+
   return {
-  content: visibleContent,
-  updatedAt: record?.updatedAt || null,
-  storage: record ? "mongodb" : "defaults",
+    content: visibleContent,
+    updatedAt: record?.updatedAt || null,
+    storage: record ? "mongodb" : "defaults",
   };
 };
 

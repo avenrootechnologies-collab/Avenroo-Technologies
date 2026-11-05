@@ -136,14 +136,11 @@ export default function ContactSection() {
     setFeedback({ type: "idle", message: "" });
 
     try {
-      const response = await API.post("/contact", form);
+      await API.post("/contact", form);
       setForm(initialForm);
       setFeedback({
         type: "success",
-        message:
-          response.data?.confirmationDelivery === "sent"
-            ? "Thanks. Your enquiry was sent. We also emailed you a confirmation."
-            : "Thanks. Your enquiry was received and we will reply with a practical next step.",
+        message: "Thanks. Your enquiry was received and we will reply with a practical next step.",
       });
     } catch (error) {
       setFeedback({

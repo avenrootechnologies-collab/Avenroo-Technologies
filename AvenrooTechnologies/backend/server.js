@@ -1,9 +1,7 @@
+import "./config/loadEnv.js";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import helmet from "helmet";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import connectDB from "./config/db.js";
 import { isDatabaseReady } from "./config/db.js";
 import contactRoutes from "./routes/contactRoutes.js";
@@ -16,33 +14,13 @@ import { apiLimiter } from "./middleware/rateLimiters.js";
 import { ensureDefaultServices } from "./utils/serviceSeed.js";
 import { getContactMailerStatus } from "./utils/contactMailer.js";
 import { logger, requestLogger } from "./utils/logger.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, ".env"), quiet: true });
+import { getAllowedClientOrigins } from "./config/clientOrigins.js";
 
 const isProduction = process.env.NODE_ENV === "production";
 const appName = "Avenroo Technologies API";
-const booleanFromEnv = (value) => ["1", "true", "yes"].includes(String(value).toLowerCase());
-
 const app = express();
 const PORT = process.env.PORT || 5000;
-const clientUrlSource =
-  process.env.CLIENT_URLS ||
-  (isProduction
-    ? process.env.RENDER_EXTERNAL_URL || ""
-    : "http://localhost:5173,http://127.0.0.1:5173");
-const allowedOrigins = clientUrlSource
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
-if (isProduction) {
-  allowedOrigins.push("https://avenroo.in", "https://www.avenroo.in");
-}
-
-const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
+const uniqueAllowedOrigins = getAllowedClientOrigins();
 
 if (isProduction && uniqueAllowedOrigins.length === 0) {
   throw new Error("CLIENT_URLS must be configured in production.");
@@ -57,10 +35,10 @@ app.use(
           directives: {
             defaultSrc: ["'self'"],
             baseUri: ["'self'"],
-            connectSrc: ["'self'", ...allowedOrigins],
+            connectSrc: ["'self'", ...uniqueAllowedOrigins],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
             frameAncestors: ["'none'"],
-            imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
+            imgSrc: ["'self'", "data:", "https://images.unsplash.com", "blob:"],
             objectSrc: ["'none'"],
             scriptSrc: ["'self'"],
             styleSrc: ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
@@ -71,10 +49,15 @@ app.use(
   }),
 );
 app.use((req, res, next) => {
-  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
   next();
 });
 app.use(requestLogger);
+app.use("/api", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Pragma", "no-cache");
+  next();
+});
 app.use("/api", apiLimiter);
 
 app.use(
@@ -93,14 +76,15 @@ app.use(
   }),
 );
 app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 app.use("/api/auth", authRoutes);
 
 app.get("/api/health", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.set("Pragma", "no-cache");
   const databaseReady = isDatabaseReady();
   const isHealthy = !isProduction || databaseReady;
-  const includeDetails = !isProduction || booleanFromEnv(process.env.HEALTH_INCLUDE_DETAILS);
+  const includeDetails = !isProduction;
 
   if (!includeDetails) {
     return res.status(isHealthy ? 200 : 503).json({
@@ -110,8 +94,7 @@ app.get("/api/health", (req, res) => {
   }
 
   const mailerStatus = getContactMailerStatus();
-  const localContactStorageAllowed =
-    !isProduction || booleanFromEnv(process.env.ALLOW_PRODUCTION_LOCAL_CONTACT_STORAGE);
+  const localContactStorageAllowed = !isProduction;
 
   return res.status(isHealthy ? 200 : 503).json({
     status: isHealthy ? "ok" : "starting",

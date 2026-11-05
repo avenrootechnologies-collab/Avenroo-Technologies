@@ -12,9 +12,15 @@ import { adminApiLimiter } from "../middleware/rateLimiters.js";
 import { getAdminAuthMailerStatus, getContactMailerStatus, getOutboundMailerStatus } from "../utils/contactMailer.js";
 import { isDatabaseReady } from "../config/db.js";
 import { documentTemplate } from "../data/documentTemplate.js";
+import { requireTrustedOrigin } from "../middleware/requireTrustedOrigin.js";
 
 const router = express.Router();
-router.use(adminApiLimiter, requireAdminAccess);
+router.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  res.set("Pragma", "no-cache");
+  next();
+});
+router.use(requireTrustedOrigin, adminApiLimiter, requireAdminAccess);
 
 router.get("/session", (_req, res) => res.json({
   authorized: true,

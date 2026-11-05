@@ -290,7 +290,7 @@ export const createService = async (req, res) => {
     res.status(201).json({ ...service.toObject(), storage: "mongodb" });
   } catch (error) {
     logRequestStep(req, "error", "service.create.failed", { error });
-    res.status(400).json({ message: error.message || "Unable to create service." });
+    res.status(500).json({ message: "Unable to create service." });
   }
 };
 
@@ -455,7 +455,7 @@ export const updateService = async (req, res) => {
       message:
         statusCode === 400
           ? "Service id is invalid."
-          : error.message || "Unable to update the service right now.",
+          : "Unable to update the service right now.",
     });
   }
 };

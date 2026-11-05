@@ -137,9 +137,12 @@ function importRowsFromCsv(text) {
 }
 
 const escapeCsv = (value) => {
-  const text = value === true ? "Yes" : value === false ? "No" : String(value ?? "");
+  const rawText = value === true ? "Yes" : value === false ? "No" : String(value ?? "");
+  const text = /^[\s\uFEFF]*[=+\-@]/.test(rawText) ? `'${rawText}` : rawText;
   return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
+
+const MAX_CSV_IMPORT_SIZE = 1024 * 1024;
 
 function downloadSheet(rows) {
   const columns = [
@@ -214,7 +217,7 @@ function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, load
               : "Finish setting up your invited account. Confirm your email before signing in."
             : "Sign in to manage enquiries, contact data, services, and email campaigns."}
         </p>
-        {isRegistering && authStatus?.verificationEmail?.configured === false && <div className="admin-auth-notice admin-auth-notice--warning mt-5"><AlertCircle size={18} /><span>Email confirmation is not ready: {authStatus.verificationEmail.reason}</span></div>}
+        {isRegistering && authStatus?.verificationEmail?.configured === false && <div className="admin-auth-notice admin-auth-notice--warning mt-5"><AlertCircle size={18} /><span>Email confirmation is temporarily unavailable. Please contact an administrator.</span></div>}
         {isRegistering && !canRegister ? (
           <div className="admin-auth-notice mt-6">
             <ShieldCheck size={18} />
@@ -226,9 +229,9 @@ function AdminLogin({ authStatus, invite, inviteError, onLogin, onRegister, load
             <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-email">Work email</label>
             <input id="admin-email" className="admin-login-input mt-2" type="email" autoComplete="email" required readOnly={Boolean(invite) || (bootstrap && isRegistering)} value={email} onChange={(event) => setEmail(event.target.value)} />
             <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-password">Password</label>
-            <input id="admin-password" className="admin-login-input mt-2" type="password" autoComplete={isRegistering ? "new-password" : "current-password"} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} />
+            <input id="admin-password" className="admin-login-input mt-2" type="password" autoComplete={isRegistering ? "new-password" : "current-password"} minLength={isRegistering ? 12 : undefined} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} />
             {isRegistering && <label className="mt-5 block text-sm font-semibold text-slate-700" htmlFor="admin-confirm-password">Confirm password<input id="admin-confirm-password" className="admin-login-input mt-2" type="password" autoComplete="new-password" maxLength={128} required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} /></label>}
-            {isRegistering && <p className="mt-2 text-xs text-slate-400">Use any password up to 128 characters.</p>}
+            {isRegistering && <p className="mt-2 text-xs text-slate-400">Use a password between 12 and 128 characters.</p>}
           </>
         )}
         {inviteError && <p role="alert" className="mt-3 text-sm font-medium text-rose-600">{inviteError}</p>}
@@ -351,8 +354,15 @@ export default function AdminPage() {
     authInitializationStarted.current = true;
     const initializeAuth = async () => {
       const params = new URLSearchParams(window.location.search);
-      const verificationToken = params.get("verify");
-      const inviteToken = params.get("invite");
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const verificationToken = hashParams.get("verify") || params.get("verify");
+      const inviteToken = hashParams.get("invite") || params.get("invite");
+      params.delete("verify");
+      params.delete("invite");
+      if (verificationToken || inviteToken) {
+        const query = params.toString();
+        window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+      }
       try {
         const status = await API.get("/auth/status");
         setAuthStatus(status.data);
@@ -362,11 +372,8 @@ export default function AdminPage() {
 
       if (inviteToken) {
         try {
-          const response = await API.get(`/auth/invites/${encodeURIComponent(inviteToken)}`);
+          const response = await API.post("/auth/invites/inspect", { token: inviteToken });
           setInviteInfo({ ...response.data, token: inviteToken });
-          params.delete("invite");
-          const query = params.toString();
-          window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
         } catch (error) {
           setInviteError(error.response?.data?.message || "This invitation is invalid or has expired.");
         }
@@ -376,9 +383,6 @@ export default function AdminPage() {
         try {
           const response = await API.post("/auth/verify", { token: verificationToken });
           setAuthMessage(response.data.message || "Email confirmed. You can now sign in.");
-          params.delete("verify");
-          const query = params.toString();
-          window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
         } catch (error) {
           setLoginError(error.response?.data?.message || "Could not confirm this email address.");
         }
@@ -491,6 +495,10 @@ export default function AdminPage() {
     event.target.value = "";
     if (!file) return;
     try {
+      if (file.size > MAX_CSV_IMPORT_SIZE) {
+        announce("CSV files must be smaller than 1 MB.");
+        return;
+      }
       const rows = importRowsFromCsv(await file.text());
       if (rows.length > 1000) {
         announce("The sheet supports up to 1,000 rows.");

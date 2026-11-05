@@ -212,19 +212,13 @@ export const createContact = async (req, res) => {
       });
     }
 
-    let emailDelivery = "not-configured";
-    let confirmationDelivery = "not-configured";
-
     try {
       const emailResult = await sendContactNotification(savedContact);
-      emailDelivery = emailResult.sent ? "sent" : "not-configured";
       logRequestStep(req, emailResult.sent ? "info" : "warn", "contact.create.email.completed", {
         contactId: savedContact._id,
-        emailDelivery,
         reason: emailResult.reason,
       });
     } catch (error) {
-      emailDelivery = "failed";
       logRequestStep(req, "error", "contact.create.email.failed", {
         contactId: savedContact._id,
         error,
@@ -233,19 +227,16 @@ export const createContact = async (req, res) => {
 
     try {
       const confirmationResult = await sendContactConfirmation(savedContact);
-      confirmationDelivery = confirmationResult.sent ? "sent" : "not-configured";
       logRequestStep(
         req,
         confirmationResult.sent ? "info" : "warn",
         "contact.create.confirmation_email.completed",
         {
           contactId: savedContact._id,
-          confirmationDelivery,
           reason: confirmationResult.reason,
         },
       );
     } catch (error) {
-      confirmationDelivery = "failed";
       logRequestStep(req, "error", "contact.create.confirmation_email.failed", {
         contactId: savedContact._id,
         error,
@@ -255,22 +246,15 @@ export const createContact = async (req, res) => {
     logRequestStep(req, "info", "contact.create.completed", {
       contactId: savedContact._id,
       storage,
-      emailDelivery,
-      confirmationDelivery,
     });
 
     return res.status(201).json({
       message: "Project brief received successfully.",
-      id: savedContact._id,
-      status: savedContact.status,
-      storage,
-      emailDelivery,
-      confirmationDelivery,
     });
   } catch (error) {
     logRequestStep(req, "error", "contact.create.failed", { error });
-    return res.status(400).json({
-      message: error.message || "Unable to save the project brief.",
+    return res.status(500).json({
+      message: "Unable to save the project brief.",
     });
   }
 };
